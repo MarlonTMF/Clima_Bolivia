@@ -207,3 +207,30 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** https://www.meteosource.com/pricing · https://open-meteo.com/en/terms
 - **Quién tenía razón:** ambos en parte
 - **¿Va al README?** Sí — «qué parte requirió más razonamiento de tu parte»
+
+---
+
+## E-05 · La firma de la función serverless estaba desactualizada
+- **Fecha / bloque:** 15-09-2026 · Bloque 03
+- **Tipo:** verificación / corrección
+- **Herramienta:** Claude (búsqueda web)
+- **Qué propuso la IA:** El código del proxy con la firma
+  `export default async function handler(): Promise<Response>`.
+- **Qué encontré o decidí yo:** Al verificar cómo se añade una función
+  serverless en cada framework —parte de la comparativa de stacks— la
+  documentación oficial mostró que para proyectos que no son Next.js la variante
+  vigente es un objeto con método `fetch`:
+  `export default { async fetch(request) { ... } }`.
+- **Cómo se resolvió:** Se corrigió antes de escribir el archivo. De paso,
+  esa misma página aportó el hallazgo más decisivo de la comparativa: el
+  directorio `api/` es **agnóstico del framework** (variante `framework=other`),
+  así que añadir el proxy cuesta lo mismo en los siete candidatos y ese criterio
+  no discrimina.
+- **Por qué:** Es el mismo patrón que E-01, en código en vez de en prosa: una
+  firma que se lee perfectamente bien, que nadie había ejecutado, y que no
+  habría fallado hasta el despliegue. **Verificar la forma de una API contra su
+  documentación cuesta una búsqueda; descubrirlo en producción cuesta el bloque
+  entero.**
+- **Fuente:** https://vercel.com/docs/functions/quickstart
+- **Quién tenía razón:** la IA, tras corregirse a sí misma al verificar
+- **¿Va al README?** Sí — «un ejemplo generado por IA que tuviste que revisar»
