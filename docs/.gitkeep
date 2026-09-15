@@ -1,0 +1,5 @@
+# Los bloques 02, 03, 05 y 15 llenan esta carpeta:
+#   decisiones.md     comparativa de APIs, stacks, arquitectura y pruebas
+#   api-sample.json   respuesta real de la API, fixture de las pruebas
+#   design/           referencia visual y tokens
+#   pruebas.md        matriz manual y métricas de Lighthouse
