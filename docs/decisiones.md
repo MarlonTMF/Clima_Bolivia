@@ -68,7 +68,7 @@ en menos de diez horas y tiene que poder explicar cada línea.
 **Alternativas consideradas.** Vanilla JS sin build, Vue 3 + Vite, Svelte,
 Astro, Next.js y Angular.
 
-**Decisión.** React 18 + Vite + TypeScript.
+**Decisión.** React 19 + Vite + TypeScript.
 
 **Razón.** Lo primero que hay que decir es que **cinco de los criterios clásicos
 no discriminan a esta escala**:
@@ -112,9 +112,19 @@ es asumir ~42 KB de runtime que Svelte no cobraría.
 **Verificado el.** 15-09-2026, contra vercel.com/docs/functions/quickstart y
 vercel.com/docs/functions/configuring-functions/region.
 
-**Caveat.** Los pesos de runtime citados vienen de comparativas de terceros, no
-de fuentes primarias, y varían entre ellas. El número autoritativo será la
-salida de `npm run build` de este proyecto, y es el que debe citarse.
+**Medición real (15-09-2026).** Tras el andamiaje, `npm run build` de una app
+vacía con React 19 da **68,60 KB gzip** (219,63 KB sin comprimir). La cifra de
+~42 KB que citaban las comparativas de terceros se queda **un 38 % corta**: era
+para el núcleo de React 18, no para React 19 más el arranque de la aplicación.
+
+Esto **no cambia la decisión** —sigue siendo irrelevante frente a los ~500 ms
+de red— pero sí cambia lo que se puede afirmar por escrito. En el README va
+68,60 KB, medido aquí, y no un número copiado de un artículo.
+
+**Caveat que queda.** Los pesos de Vue, Svelte, Astro, Next.js y Angular siguen
+siendo de comparativas de terceros y sin medir. Si la de React estaba un 38 %
+corta, las demás probablemente también: sirven como orden de magnitud para
+descartar, no como medida.
 
 ---
 
@@ -399,3 +409,23 @@ type CityForecast = {
 
 Escrito antes de codificarlo, a propósito: definir el modelo propio antes de ver
 la forma de la API es lo que evita que la segunda contamine al primero.
+
+---
+
+## Apéndice · Lo que el andamiaje contradijo
+
+Tres cosas que el plan daba por supuestas y la realidad corrigió al ejecutar
+`npm create vite`, el 15-09-2026:
+
+1. **La plantilla trae React 19**, no 18, con TypeScript 6 y Vite 8.
+2. **El linter es `oxlint`, no ESLint.** Viene configurado de fábrica en
+   `.oxlintrc.json`. No se cambia: funciona y es una dependencia menos que
+   justificar. D-10 hablaba de ESLint por costumbre, no por haberlo elegido.
+3. **`tsc --noEmit` no verifica nada en este proyecto.** El `tsconfig.json`
+   raíz es un archivo de referencias sin archivos propios, así que devuelve
+   éxito aunque haya errores de tipos. Verificado introduciendo un error
+   deliberado: `tsc --noEmit` salió con código 0, `tsc -b --noEmit` con código
+   2 y el error correcto. **El hook y el script `typecheck` usan `-b`.**
+
+El tercero es el importante: un hook con el comando equivocado no falla, pasa
+—y da confianza falsa durante todo el proyecto, que es peor que no tener hook.

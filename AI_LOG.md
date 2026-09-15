@@ -234,3 +234,29 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** https://vercel.com/docs/functions/quickstart
 - **Quién tenía razón:** la IA, tras corregirse a sí misma al verificar
 - **¿Va al README?** Sí — «un ejemplo generado por IA que tuviste que revisar»
+
+---
+
+## E-06 · El hook del plan habría pasado en silencio sobre todos los errores
+- **Fecha / bloque:** 15-09-2026 · Bloque 04
+- **Tipo:** corrección
+- **Herramienta:** Claude
+- **Qué propuso la IA:** Un hook `PostToolUse` que ejecuta `npx tsc --noEmit`
+  después de cada edición de archivo, presentado como la pieza que «separa lo
+  probabilístico de lo determinista».
+- **Qué encontré o decidí yo:** Antes de escribirlo, probé el comando
+  introduciendo un error de tipos deliberado. `npx tsc --noEmit` **salió con
+  código 0**: el `tsconfig.json` de la plantilla de Vite es un archivo de
+  referencias sin archivos propios, así que no comprueba nada.
+  `npx tsc -b --noEmit` sí detectó el error y salió con código 2.
+- **Cómo se resolvió:** El hook y el script `typecheck` usan `tsc -b --noEmit`.
+  Queda anotado en `CLAUDE.md` y en el apéndice de `docs/decisiones.md` para no
+  volver a caer.
+- **Por qué:** Es el peor modo de fallo posible para una salvaguarda: **no
+  falla, pasa**. Un hook roto que devuelve verde da confianza falsa durante todo
+  el proyecto, y el error aparece mucho más tarde y más caro. La lección es
+  concreta: **una verificación automática hay que verificarla haciéndola
+  fallar**, no comprobando que pasa. Que pase no prueba nada.
+- **Fuente:** —
+- **Quién tenía razón:** yo — probar el comando antes de confiar en él
+- **¿Va al README?** Sí — «un ejemplo generado por IA que tuviste que corregir»
