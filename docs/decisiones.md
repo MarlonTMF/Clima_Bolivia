@@ -524,3 +524,15 @@ en el ancho disponible. Es esperado en este punto: el pase completo de
 referencia de Stitch) es el bloque 12, no se adelantó aquí para no duplicar
 trabajo. La lógica y los datos ya están verificados correctos — cambio de
 ciudad, jerarquía máx/mín, altitud, sensación térmica — solo falta el estilo.
+
+---
+
+## Nota de accesibilidad (bloque 12)
+
+Verificado con la fórmula de luminancia relativa de WCAG 2.1, no a ojo: el
+acento extraído (`#0284C7`) da **4.10:1** contra blanco — pasa el umbral de
+3:1 para bordes y foco, pero **no llega al 4.5:1** que exige texto pequeño.
+El badge "HOY" (texto blanco, ~11px) usa un tono un 15% más oscuro,
+`--color-accent-text: #0270A9` (5.39:1), solo para ese caso. El resto de
+la interfaz conserva el acento original de `tokens.md` sin modificar. El
+texto secundario (`#64748B`) ya daba 4.76:1 sin necesidad de ajuste.
