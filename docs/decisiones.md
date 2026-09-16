@@ -250,6 +250,15 @@ marcado que no podría explicar clase por clase.
 **Consecuencia.** La implementación cuesta más tiempo que pegar el export, y a
 cambio cada línea del proyecto es defendible.
 
+**Resultado (15-09-2026).** Se generaron 4 pantallas: principal, cargando,
+error y datos antiguos (esta última existe por D-09). Una vuelta de
+corrección quitó del diseño generado lo que Stitch había añadido sin que se
+pidiera — gráfico de barras, pestaña comparativa, icono de usuario, branding
+de "red oficial" y "norma OMM", humedad y presión (ver D-11) — y añadió
+sensación térmica y viento con datos reales. Confirmado que el `code.html`
+exportado usa Tailwind CDN y Material Symbols, como se anticipaba: no se usa.
+Tokens extraídos a `docs/design/tokens.md`.
+
 ---
 
 ## D-09 · Backend mínimo: función proxy con caché

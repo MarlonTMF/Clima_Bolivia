@@ -260,3 +260,33 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** —
 - **Quién tenía razón:** yo — probar el comando antes de confiar en él
 - **¿Va al README?** Sí — «un ejemplo generado por IA que tuviste que corregir»
+
+---
+
+## E-07 · El diseño generado incluía una afirmación de autoridad que no podíamos sostener
+- **Fecha / bloque:** 15-09-2026 · Bloque 05
+- **Tipo:** verificación
+- **Herramienta:** Stitch (generación) + revisión propia
+- **Qué propuso la IA (Stitch):** La primera generación incluyó branding de
+  "RED OFICIAL DE MONITOREO ATMOSFÉRICO · ESTADO PLURINACIONAL DE BOLIVIA" y
+  "NORMA OMM REGIÓN III", además de datos de humedad, presión y sensación
+  térmica que no verificamos si la API los daba.
+- **Qué encontré o decidí yo:** Revisé la captura contra lo que realmente
+  podemos mostrar. El branding de "servicio oficial" es engañoso para un
+  proyecto personal; la afirmación de "norma OMM" es un cumplimiento
+  normativo no verificado. Antes de pedir su eliminación, verifiqué también
+  cuáles de los cuatro datos meteorológicos extra admite la API a
+  granularidad diaria (D-11): sensación térmica y viento sí, humedad y
+  presión no.
+- **Cómo se resolvió:** Prompt de corrección a Stitch quitando el branding
+  falso y los dos datos no disponibles, añadiendo los dos que sí lo están con
+  cifras reales de la API. Segunda generación correcta en los 4 estados.
+- **Por qué:** Una herramienta de diseño no tiene forma de saber qué datos
+  provee nuestra fuente real ni qué afirmaciones institucionales son
+  apropiadas para el proyecto — genera lo que es visualmente convincente, no
+  lo que es cierto. La revisión tuvo que aportar ambas cosas: criterio sobre
+  qué se puede afirmar, y verificación de qué se puede mostrar.
+- **Fuente:** open-meteo.com/en/docs (D-11)
+- **Quién tenía razón:** yo — la revisión detectó ambos problemas antes de
+  implementar
+- **¿Va al README?** Sí — «qué parte requirió más razonamiento de tu parte»

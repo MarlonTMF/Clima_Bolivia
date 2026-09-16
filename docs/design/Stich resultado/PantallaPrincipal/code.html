@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bolivia Clima · Pronóstico Meteorológico Departamental</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#006194",
+            "on-primary": "#ffffff",
+            "primary-container": "#007bb9",
+            "on-primary-container": "#fdfcff",
+            "primary-fixed": "#cce5ff",
+            "primary-fixed-dim": "#93ccff",
+            "on-primary-fixed": "#001d31",
+            "on-primary-fixed-variant": "#004b73",
+            "secondary": "#565e74",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#dae2fd",
+            "on-secondary-container": "#5c647a",
+            "secondary-fixed": "#dae2fd",
+            "secondary-fixed-dim": "#bec6e0",
+            "on-secondary-fixed": "#131b2e",
+            "on-secondary-fixed-variant": "#3f465c",
+            "tertiary": "#894d00",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#ac6200",
+            "on-tertiary-container": "#fffbff",
+            "tertiary-fixed": "#ffdcc0",
+            "tertiary-fixed-dim": "#ffb875",
+            "on-tertiary-fixed": "#2d1600",
+            "on-tertiary-fixed-variant": "#6b3b00",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "background": "#f8f9ff",
+            "on-background": "#0b1c30",
+            "surface": "#f8f9ff",
+            "on-surface": "#0b1c30",
+            "surface-dim": "#cbdbf5",
+            "surface-bright": "#f8f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d3e4fe",
+            "surface-variant": "#d3e4fe",
+            "on-surface-variant": "#3f4850",
+            "outline": "#707881",
+            "outline-variant": "#bfc7d2",
+            "inverse-surface": "#213145",
+            "inverse-on-surface": "#eaf1ff",
+            "inverse-primary": "#93ccff",
+            "surface-tint": "#006398"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem"
+          },
+          fontFamily: {
+            "headline-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-xl": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "tabular-data-sm": ["JetBrains Mono"],
+            "tabular-data-md": ["JetBrains Mono"],
+            "tabular-data-lg": ["JetBrains Mono"],
+            "tabular-data-xl": ["JetBrains Mono"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased flex flex-col min-h-screen">
+<!-- 1. ENCABEZADO -->
+<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md border-b border-surface-container shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+<div class="h-16 w-full max-w-[1400px] mx-auto px-6 lg:px-8 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[24px]">wb_sunny</span>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm font-bold tracking-tight text-on-surface text-[15px]">BOLIVIA CLIMA</span>
+<span class="text-outline-variant font-light">|</span>
+<span class="font-label-sm uppercase tracking-wider text-on-surface-variant text-[12px] font-medium hidden sm:inline">Pronóstico Meteorológico Departamental</span>
+</div>
+</div>
+<div class="flex items-center">
+<span class="font-tabular-data-sm text-[12px] tracking-wide text-on-surface-variant font-medium">UTC-4 · HORA OFICIAL LA PAZ, BOLIVIA</span>
+</div>
+</div>
+</header>
+<!-- CONTENIDO PRINCIPAL -->
+<main class="w-full pt-20 pb-12 flex-1">
+<div class="w-full max-w-[1400px] mx-auto px-6 lg:px-8 flex flex-col gap-6">
+<!-- 2. SELECTOR DEPARTAMENTAL CON ILUSTRACIÓN DE BOLIVIA (COMPACTO Y BALANCEADO) -->
+<section class="w-full flex flex-col gap-3">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">map</span>
+<span class="font-headline-sm text-[17px] text-on-surface font-semibold">Seleccionar Capital &amp; Región</span>
+</div>
+<span class="font-label-sm text-[12px] text-outline uppercase tracking-wider font-medium">9 Capitales Departamentales</span>
+</div>
+<div class="w-full bg-surface-container-lowest rounded-xl p-5 border border-surface-container shadow-sm flex flex-col lg:flex-row items-stretch gap-6">
+<!-- Ilustración esquemática del mapa de Bolivia -->
+<div class="relative flex flex-col items-center justify-center bg-surface-container-low rounded-xl p-3 border border-surface-container flex-shrink-0 lg:w-72 xl:w-80 self-center lg:self-stretch">
+<svg class="w-56 h-60 select-none drop-shadow-sm" viewbox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+<!-- Pando -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M68,26 L108,18 L152,42 L132,68 L88,62 L60,42 Z">
+<title>Pando (Cobija)</title>
+</path>
+<!-- Beni -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M152,42 L206,62 L228,118 L188,142 L132,132 L132,68 Z">
+<title>Beni (Trinidad)</title>
+</path>
+<!-- La Paz (Activo) -->
+<path class="cursor-pointer transition-colors fill-primary stroke-white" d="M62,68 L132,68 L132,132 L120,166 L68,170 L46,126 L68,98 Z">
+<title>La Paz (La Paz) - Activo</title>
+</path>
+<!-- Cochabamba -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M132,132 L188,142 L186,188 L136,184 L120,166 Z">
+<title>Cochabamba (Cochabamba)</title>
+</path>
+<!-- Santa Cruz -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M188,142 L228,118 L304,136 L292,238 L222,234 L186,188 Z">
+<title>Santa Cruz (Santa Cruz de la Sierra)</title>
+</path>
+<!-- Oruro -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M68,170 L120,166 L124,224 L62,216 Z">
+<title>Oruro (Oruro)</title>
+</path>
+<!-- Chuquisaca -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M136,184 L186,188 L184,244 L138,242 Z">
+<title>Chuquisaca (Sucre)</title>
+</path>
+<!-- Potosí -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M62,216 L124,224 L138,242 L144,306 L82,306 L58,262 Z">
+<title>Potosí (Potosí)</title>
+</path>
+<!-- Tarija -->
+<path class="cursor-pointer transition-colors fill-surface-variant hover:fill-secondary-container" d="M138,242 L184,244 L212,242 L206,306 L144,306 Z">
+<title>Tarija (Tarija)</title>
+</path>
+</g>
+<circle cx="84" cy="124" fill="#ffffff" r="4.5" stroke="#006194" stroke-width="2.5"></circle>
+<text class="font-sans font-bold" fill="#ffffff" font-size="11" text-anchor="middle" x="84" y="112">La Paz</text>
+</svg>
+<div class="mt-2 flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-md border border-surface-container shadow-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-[10px] font-bold text-primary uppercase tracking-wider">DEPTO. ACTIVO: LA PAZ</span>
+</div>
+</div>
+<!-- Selector vertical/grid compacto optimizado a la altura del mapa -->
+<div class="flex-1 flex flex-col justify-between gap-2.5">
+<div class="flex items-center justify-between pb-1 border-b border-surface-container">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Seleccionar Departamento</span>
+<span class="font-label-sm text-[11px] text-outline-variant">9 departamentos</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+<!-- La Paz (Activo) -->
+<button aria-current="page" class="px-3 py-2 rounded-lg bg-primary text-on-primary flex items-center justify-between shadow-xs ring-1 ring-primary text-left transition-all" type="button">
+<div class="flex flex-col truncate pr-1">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-bright"></span>
+<span class="text-[13px] font-bold truncate">La Paz</span>
+</div>
+<span class="text-[11px] text-primary-fixed leading-tight truncate">La Paz</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-primary-fixed font-medium whitespace-nowrap">3.640m</span>
+</button>
+<!-- Chuquisaca -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Chuquisaca</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Sucre</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">2.790m</span>
+</button>
+<!-- Cochabamba -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Cochabamba</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Cochabamba</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">2.558m</span>
+</button>
+<!-- Oruro -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Oruro</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Oruro</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">3.735m</span>
+</button>
+<!-- Potosí -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Potosí</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Potosí</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">4.067m</span>
+</button>
+<!-- Tarija -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Tarija</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Tarija</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">1.874m</span>
+</button>
+<!-- Santa Cruz -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Santa Cruz</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Santa Cruz de la Sierra</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">416m</span>
+</button>
+<!-- Beni -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Beni</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Trinidad</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">130m</span>
+</button>
+<!-- Pando -->
+<button class="px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-surface-container-highest transition-colors flex items-center justify-between text-left group" type="button">
+<div class="flex flex-col truncate pr-1">
+<span class="text-[13px] font-medium text-on-surface group-hover:text-primary transition-colors truncate">Pando</span>
+<span class="text-[11px] text-on-surface-variant leading-tight truncate">Cobija</span>
+</div>
+<span class="font-tabular-data-sm text-[11px] text-outline whitespace-nowrap">280m</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. RESUMEN DE LA CIUDAD SELECCIONADA (LA PAZ) -->
+<section class="w-full bg-surface-container-lowest rounded-xl p-6 sm:p-8 border border-surface-container shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-1.5 text-outline">
+<span class="material-symbols-outlined text-[17px] text-primary">location_on</span>
+<span class="font-label-md text-[13px] font-medium tracking-wide">3.640 m s. n. m. · Altiplano Central</span>
+</div>
+<h1 class="font-headline-xl text-3xl sm:text-4xl text-on-surface font-bold tracking-tight">La Paz</h1>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant">
+<svg class="w-6 h-6 text-primary flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="4"></circle>
+<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+</svg>
+<span class="font-headline-sm text-base text-on-surface font-medium">Nubosidad Variable</span>
+</div>
+</div>
+<div class="flex items-center gap-8 border-t md:border-t-0 md:border-l border-surface-container pt-5 md:pt-0 md:pl-8">
+<div class="flex flex-col">
+<span class="font-tabular-data-xl text-5xl sm:text-6xl font-bold text-on-surface tracking-tight leading-none">11.4°</span>
+<span class="font-label-md text-[13px] text-outline mt-1 font-medium">Sensación 11°</span>
+</div>
+<div class="h-10 w-px bg-surface-container hidden sm:block"></div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<svg class="w-5 h-5 text-primary flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
+</svg>
+<div class="flex flex-col">
+<span class="font-tabular-data-md text-sm font-semibold text-on-surface">14 km/h</span>
+<span class="font-label-sm text-[11px] text-outline leading-tight">Viento ESE</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. PRONÓSTICO DE 7 DÍAS (FILA HORIZONTAL DE 7 TARJETAS) -->
+<section class="w-full flex flex-col gap-3">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">calendar_month</span>
+<span class="font-headline-sm text-[17px] text-on-surface font-semibold">Pronóstico a 7 días</span>
+</div>
+<span class="font-tabular-data-sm text-[12px] font-semibold text-outline uppercase tracking-wider">MARTES 15 – LUNES 21 SEP</span>
+</div>
+<div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+<!-- Día 1: Mar 15 sep (Hoy) -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border-2 border-primary/40 shadow-sm flex flex-col justify-between gap-3 relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-bold text-on-surface">Mar 15 sep</span>
+<span class="bg-primary text-on-primary text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">Hoy</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Parcialmente nublado</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">18°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">-2°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">15° / -6°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">17 km/h</span>
+</div>
+</div>
+</div>
+<!-- Día 2: Mié 16 sep -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container shadow-sm flex flex-col justify-between gap-3 hover:border-surface-container-highest transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface">Mié 16 sep</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M8 19v2m8-2v2m-4-2v2M20 16.58A5 5 0 0018 7h-1.26A8 8 0 104 15.25"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Llovizna</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">17°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">1°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">15° / -2°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">14 km/h</span>
+</div>
+</div>
+</div>
+<!-- Día 3: Jue 17 sep -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container shadow-sm flex flex-col justify-between gap-3 hover:border-surface-container-highest transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface">Jue 17 sep</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3 15a4 4 0 004 4h11a5 5 0 001.5-9.77A7 7 0 005.1 8.9 4 4 0 003 15z"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Nublado</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">16°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">1°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">13° / -1°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">19 km/h</span>
+</div>
+</div>
+</div>
+<!-- Día 4: Vie 18 sep -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container shadow-sm flex flex-col justify-between gap-3 hover:border-surface-container-highest transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface">Vie 18 sep</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20 17.58A5 5 0 0018 8h-1.26A8 8 0 104 16.25M8 16h.01M8 20h.01M12 18h.01M12 22h.01M16 16h.01M16 20h.01"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Nieve</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">15°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">2°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">14° / 0°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">15 km/h</span>
+</div>
+</div>
+</div>
+<!-- Día 5: Sáb 19 sep -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container shadow-sm flex flex-col justify-between gap-3 hover:border-surface-container-highest transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface">Sáb 19 sep</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20 17.58A5 5 0 0018 8h-1.26A8 8 0 104 16.25M8 16h.01M8 20h.01M12 18h.01M12 22h.01M16 16h.01M16 20h.01"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Nieve</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">16°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">2°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">13° / 0°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">15 km/h</span>
+</div>
+</div>
+</div>
+<!-- Día 6: Dom 20 sep -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container shadow-sm flex flex-col justify-between gap-3 hover:border-surface-container-highest transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface">Dom 20 sep</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="5"></circle>
+<path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Despejado</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">16°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">-2°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">16° / -6°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">9 km/h</span>
+</div>
+</div>
+</div>
+<!-- Día 7: Lun 21 sep -->
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-surface-container shadow-sm flex flex-col justify-between gap-3 hover:border-surface-container-highest transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface">Lun 21 sep</span>
+</div>
+<div class="flex flex-col items-center text-center my-1 gap-1.5">
+<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+</svg>
+<span class="font-label-sm text-[11px] font-medium text-on-surface-variant leading-tight">Parcialmente nublado</span>
+</div>
+<div class="pt-2 border-t border-surface-container flex flex-col gap-1.5">
+<div class="flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Máx</span>
+<span class="font-tabular-data-lg text-lg font-bold text-on-surface">17°</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[9px] uppercase font-bold text-outline">Mín</span>
+<span class="font-tabular-data-sm text-sm font-semibold text-on-surface-variant">0°</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded p-1.5 flex items-center justify-between text-[10px]">
+<span class="text-outline">Sensación</span>
+<span class="font-tabular-data-sm font-medium text-on-surface">15° / -3°</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] text-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] text-primary">air</span>
+<span class="font-tabular-data-sm text-[11px] text-on-surface-variant">18 km/h</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- 6. PIE DE PÁGINA (FOOTER SIMPLE) -->
+<footer class="w-full bg-surface-container-lowest border-t border-surface-container mt-auto">
+<div class="w-full max-w-[1400px] mx-auto px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">Datos: Open-Meteo</span>
+<span class="font-tabular-data-sm text-tabular-data-sm text-on-surface-variant">Actualización cada 30 minutos</span>
+</div>
+</footer>
+</body></html>
