@@ -442,3 +442,33 @@ algo fuera de estas paradas se registra igual.
 - **Quién tenía razón:** —
 - **¿Va al README?** Sí — «un ejemplo generado por IA que tuviste que
   revisar o corregir»
+
+---
+
+## E-13 · npm test en verde no significa npm run typecheck en verde
+- **Fecha / bloque:** 16-09-2026 · Bloque 13
+- **Tipo:** corrección
+- **Herramienta:** cadena de verificación completa (typecheck + test + build + lint)
+- **Qué propuso la IA:** Configuré `vite.config.ts` con `import { defineConfig }
+  from "vite"` y un campo `test: { environment: "jsdom", ... }`. Corrí la
+  suite completa (`npx vitest run`), pasó — 16 pruebas en verde — y estuve a
+  punto de dar el bloque por cerrado ahí.
+- **Qué encontré o decidí yo:** Antes de comitear corrí la cadena completa
+  de todas formas, por disciplina (E-06 ya enseñó que un paso en verde no
+  garantiza que los demás lo estén). `npm run typecheck` falló:
+  `defineConfig` de `'vite'` no conoce el campo `test` — ese tipo lo
+  añade `'vitest/config'`, que reexporta la versión de Vite fusionada
+  con los tipos de Vitest. Vitest en tiempo de ejecución no necesita esos
+  tipos para funcionar, así que la suite pasaba igual; `tsc -b` sí los
+  necesita y fallaba.
+- **Cómo se resolvió:** Cambiar el import a `vitest/config`. Cero cambios
+  de comportamiento, typecheck vuelve a pasar.
+- **Por qué:** Es la misma familia de error que E-06, en otro punto de la
+  cadena: una herramienta que pasa no prueba que las demás pasen. Con
+  cuatro comandos de verificación (typecheck, test, build, lint) hace
+  falta correr los cuatro, no asumir que uno implica los otros — y este
+  bloque es la prueba concreta de que esa disciplina encuentra errores
+  reales, no es un ritual vacío.
+- **Fuente:** —
+- **Quién tenía razón:** —
+- **¿Va al README?** Sí — «cómo validas los resultados»
