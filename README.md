@@ -9,7 +9,7 @@ nueve capitales departamentales de Bolivia.
 ![Vista de escritorio de la aplicación](docs/img/captura-escritorio.png)
 
 <details>
-<summary>Vista móvil (390 px)</summary>
+<summary><strong>&#9660; Ver la vista móvil (390 px)</strong></summary>
 
 <img src="docs/img/captura-movil.png" alt="Vista móvil de la aplicación" width="390">
 
@@ -180,111 +180,50 @@ en Chromium y en Firefox, con el resultado real anotado en
 [`docs/pruebas.md`](docs/pruebas.md) — incluidos los que hubo que
 replantear porque no probaban lo que decían.
 
-### La prueba del orden, que es la que más importa
+### La prueba que más importa
 
-La API devuelve un array en el orden de la petición. Si ese orden se
-rompiera, **cada ciudad mostraría el clima de otra sin que nada fallara**:
-sin error, sin excepción, sin pista. Es el único fallo verdaderamente
-silencioso del proyecto.
+La API devuelve un array **en el orden de la petición**. Si ese orden se
+rompiera, cada ciudad mostraría el clima de otra sin error, sin excepción y
+sin pista: es el único fallo verdaderamente silencioso del proyecto. Hay una
+prueba que compara los parámetros de la URL contra `CITIES`, y se comprobó
+que sirve invirtiendo el orden a propósito — al hacerlo falla ella sola,
+mientras las otras seis del archivo siguen en verde.
 
-Se añadió una prueba que compara los parámetros de la URL contra `CITIES`, y
-se comprobó que sirve **invirtiendo el orden a propósito**. Al hacerlo, la
-prueba falla — y las otras seis del mismo archivo siguen pasando en verde.
-Esa es la demostración de por qué hacía falta.
-
-### `npm run audit`, y por qué existe
+### `npm run audit`
 
 Casi todos los errores reales de este proyecto fueron del mismo tipo: **código
-válido que no produce ningún error y simplemente no hace nada**. Una regla CSS
-apuntando a una clase inexistente. Un contorno de foco sobre un elemento con
-`opacity: 0`, invisible aunque el CSS fuera correcto. Un `flex-direction` en
-un contenedor que a ese ancho es `grid`. `tsc` y `oxlint` no los ven porque
-comprueban sintaxis y tipos, no efecto.
+válido que no falla y no hace nada**. Una regla CSS apuntando a una clase
+inexistente, un contorno de foco sobre un elemento con `opacity: 0`, un
+`flex-direction` en un contenedor que a ese ancho es `grid`. `tsc` y `oxlint`
+no los ven porque comprueban sintaxis y tipos, no efecto.
 
-`scripts/audit.mjs` comprueba esas seis categorías. **Cada una existe porque
-ese error se cometió de verdad aquí**, y se verificó que la auditoría los
-detecta reintroduciéndolos uno a uno en lugar de darla por buena por estar
-escrita. La primera versión de una de las comprobaciones no detectaba nada y
-hubo que reescribirla.
+`scripts/audit.mjs` cubre esas seis categorías. Cada una existe porque ese
+error se cometió aquí, y se verificó reintroduciéndolos uno a uno en lugar de
+dar la auditoría por buena por estar escrita.
 
 ### Qué se decidió NO probar
 
-- **Sin pruebas de extremo a extremo permanentes.** Playwright se usó como
-  herramienta de verificación puntual, no como dependencia del proyecto: para
-  una sola pantalla, mantener esa infraestructura cuesta más de lo que aporta.
-- **Sin pruebas de instantánea:** se rompen con cada ajuste de estilo y no
-  afirman nada sobre el comportamiento.
-- **Sin objetivo de cobertura porcentual:** perseguir el número lleva a probar
-  código trivial. Se declara qué está cubierto y qué no.
-- **Sin pruebas de carga:** sitio estático con un techo fijo de 63 datos.
-- **Sin probar React ni `fetch`:** son dependencias, no código propio.
+Sin pruebas de extremo a extremo permanentes (Playwright se usó como
+herramienta puntual, no como dependencia), sin instantáneas, sin objetivo de
+cobertura porcentual, sin pruebas de carga y sin probar React ni `fetch`. El
+razonamiento de cada exclusión está en [`docs/pruebas.md`](docs/pruebas.md).
 
 ---
 
 ## Decisiones técnicas principales
 
-Las catorce decisiones están razonadas en
-[`docs/decisiones.md`](docs/decisiones.md) con su contexto, las alternativas
-consideradas y su consecuencia. Las principales:
+Las catorce están razonadas en [`docs/decisiones.md`](docs/decisiones.md) con
+su contexto, alternativas y consecuencia. En resumen:
 
-**Una sola petición para las nueve ciudades.** Open-Meteo acepta varias
-coordenadas a la vez. Nueve peticiones habrían significado nueve formas de
-fallar parcialmente y nueve veces la latencia.
-
-**El orden de las ciudades es significativo, y es deliberado.** La respuesta
-llega como array en el orden de la petición, y las coordenadas devueltas
-vienen ajustadas a la malla del modelo meteorológico, así que **no se pueden
-reemparejar comparándolas**. El acoplamiento es la solución correcta aquí, no
-un descuido: está documentado y hay una prueba que lo vigila.
-
-**La respuesta cruda de la API nunca sale de `weatherApi.ts`.** Ningún
-componente ve un `temperature_2m_max`. Es la decisión más barata de tomar y
-la que más se ha pagado: cambiar de proveedor sería tocar un archivo.
-
-**Ocho categorías de clima en lugar de treinta códigos.** Un usuario no
-necesita distinguir «llovizna helada ligera» de «llovizna helada densa». Los
-códigos desconocidos caen en un valor neutro para que la tarjeta no se rompa
-si la API añade alguno.
-
-**El diseño se generó con una herramienta de IA; su código, no.** El export
-traía Tailwind, una librería de iconos y cientos de líneas de marcado que no
-se podrían explicar. Se tomó como especificación visual —paleta, escala
-tipográfica, composición, comportamiento responsive— y se implementó a mano.
-
-**Cuatro estados, no tres.** Cargando, con datos, con datos antiguos y con
-error. La distinción que importa es que **un fallo con copia guardada no es
-lo mismo que un fallo sin ella**: en el primer caso hay datos reales, sólo
-que viejos, y ocultarlos sería peor que mostrarlos avisando.
-
-### La decisión que cambió tres veces: el backend
-
-Es la más interesante del proyecto, y por eso se cuenta entera.
-
-1. **No construir backend.** Ninguno de los problemas que resuelve estaba
-   presente: sin clave que ocultar, con CORS habilitado y con los datos ya
-   agregados por la API.
-2. **Sí construirlo.** La revisión encontró dos fallos en ese razonamiento.
-   El primero: trataba la disponibilidad del proveedor como un problema
-   ajeno, cuando en una aplicación desplegada y evaluada **el que parece roto
-   es este proyecto** — y los términos de Open-Meteo declinan por escrito
-   garantizar el servicio. El segundo: la objeción sobre los arranques en
-   frío describía a otra clase de plataforma, no a la que se estaba usando.
-   Se diseñó un proxy con caché al completo.
-3. **Finalmente, no construirlo.** Con la aplicación ya desplegada y
-   verificada, la pregunta volvió: ¿hace falta de verdad? El argumento de
-   resiliencia seguía siendo válido, pero **su proporción no**: blindar
-   contra una caída improbable añadiendo una capa entera de arquitectura es
-   exactamente la sobre-ingeniería que el enunciado pide evitar. Y más
-   superficie no es sólo más protección — un proxy mal configurado falla de
-   formas que la llamada directa no tiene, incluido cachear un error.
-
-El diseño completo se conserva escrito como respuesta a «¿y si esto fuera
-producción?». **Lo que sí se implementó fue su capa cliente**: guardar la
-última respuesta correcta en el navegador, que no necesita servidor y da
-datos reales al estado de «datos antiguos».
-
-Cada vuelta incorporó información que la anterior no tenía, y la tercera fue
-la propia aplicación terminada.
+| Decisión | Por qué |
+|---|---|
+| **Una sola petición** para las nueve ciudades | Nueve habrían sido nueve formas de fallar parcialmente y nueve veces la latencia |
+| **El orden de `cities.ts` es significativo** | La respuesta llega en el orden pedido y las coordenadas vuelven ajustadas a la malla del modelo, así que no se pueden reemparejar. El acoplamiento es la solución correcta, y una prueba lo vigila |
+| **La respuesta cruda no sale de `weatherApi.ts`** | Ningún componente ve un `temperature_2m_max`. Cambiar de proveedor sería tocar un archivo |
+| **Ocho categorías de clima, no treinta códigos** | Nadie necesita distinguir «llovizna helada ligera» de «densa». Los códigos desconocidos caen en un valor neutro |
+| **El diseño se generó con IA; su código, no** | El export traía Tailwind, iconos y cientos de líneas que no se podrían explicar. Se usó como especificación visual y se implementó a mano |
+| **Cuatro estados, no tres** | Un fallo con copia guardada no es lo mismo que uno sin ella: hay datos reales, sólo que viejos |
+| **Sin backend** | Se diseñó un proxy con caché y se decidió no construirlo: el problema de resiliencia era real, pero la solución desproporcionada para este alcance. El diseño se conserva escrito y sólo se implementó su capa cliente, la copia en el navegador |
 
 ---
 
