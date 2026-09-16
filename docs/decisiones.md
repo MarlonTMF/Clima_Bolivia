@@ -511,3 +511,16 @@ haya configurado nada. Esto es distinto de la región de la *función*
 serverless (D-09), que se fija explícitamente en `vercel.json` y solo
 importa cuando exista `api/forecast.ts` (bloque 14) — no confundir las dos
 cosas.
+
+---
+
+## Nota para el bloque 12
+
+Verificado con Playwright tras el bloque 10 (16-09-2026): con el CSS mínimo
+actual hay **scroll horizontal tanto a 375px como a 900px** — la grilla de 7
+tarjetas y el `<select>` con "Santa Cruz de la Sierra — Santa Cruz" no caben
+en el ancho disponible. Es esperado en este punto: el pase completo de
+`docs/design/tokens.md` (responsive, apilado vertical en móvil según la
+referencia de Stitch) es el bloque 12, no se adelantó aquí para no duplicar
+trabajo. La lógica y los datos ya están verificados correctos — cambio de
+ciudad, jerarquía máx/mín, altitud, sensación térmica — solo falta el estilo.

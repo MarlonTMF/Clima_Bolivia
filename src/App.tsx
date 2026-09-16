@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { fetchForecasts } from "./lib/weatherApi";
+import { CITIES } from "./data/cities";
+import { CitySelector } from "./components/CitySelector";
+import { ForecastGrid } from "./components/ForecastGrid";
 import type { CityForecast } from "./types";
 
-/**
- * Render mínimo, deliberadamente sin estilos ni componentes: el objetivo
- * del bloque 09 es probar que el pipeline de despliegue funciona con datos
- * reales, antes de invertir tiempo en la interfaz (bloque 10).
- */
 export default function App() {
   const [forecasts, setForecasts] = useState<CityForecast[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // D-04: primera ciudad del array, sin caso especial. Sucre, capital
+  // constitucional, es CITIES[0] por ese orden — no porque se privilegie.
+  const [selectedId, setSelectedId] = useState<string>(CITIES[0].id);
 
   useEffect(() => {
     fetchForecasts()
@@ -19,27 +20,26 @@ export default function App() {
       );
   }, []);
 
+  const selected = forecasts?.find((f) => f.city.id === selectedId);
+
   return (
-    <main style={{ fontFamily: "monospace", padding: "1rem" }}>
-      <h1>Clima Bolivia</h1>
-      {error && <p style={{ color: "crimson" }}>Error: {error}</p>}
+    <main className="app">
+      <header className="app__header">
+        <h1>Clima Bolivia</h1>
+        <p className="app__subtitle">Pronóstico de 7 días para las 9 capitales departamentales</p>
+      </header>
+
+      {/* Estados de carga y error reales llegan en el bloque 11.
+          Placeholder mínimo aquí para que la app no se rompa mientras tanto. */}
+      {error && <p role="alert">Error: {error}</p>}
       {!forecasts && !error && <p>Cargando…</p>}
-      {forecasts?.map((f) => (
-        <section key={f.city.id}>
-          <h2>
-            {f.city.name} ({f.city.elevationM} m)
-          </h2>
-          <ul>
-            {f.days.map((d) => (
-              <li key={d.date}>
-                {d.date} — {d.condition.icon} {d.condition.label} — máx {d.maxTemp}° / mín{" "}
-                {d.minTemp}° — sensación {d.feelsLikeMax}°/{d.feelsLikeMin}° — viento{" "}
-                {d.windMaxKmh} km/h
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+
+      {forecasts && (
+        <>
+          <CitySelector cities={CITIES} selectedId={selectedId} onSelect={setSelectedId} />
+          {selected && <ForecastGrid forecast={selected} />}
+        </>
+      )}
     </main>
   );
 }
