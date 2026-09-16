@@ -408,3 +408,37 @@ algo fuera de estas paradas se registra igual.
 - **Quién tenía razón:** —
 - **¿Va al README?** No — detalle de proceso, ya cubierto conceptualmente
   por E-06
+
+---
+
+## E-12 · El fixture guardado en el bloque 02 quedó desactualizado sin que nadie lo notara
+- **Fecha / bloque:** 16-09-2026 · Bloque 08
+- **Tipo:** corrección
+- **Herramienta:** Vitest (ejecución real de las pruebas)
+- **Qué propuso la IA:** Escribí la prueba "mapea la respuesta real" contra
+  `docs/api-sample.json`, dando por hecho que ese fixture reflejaba lo que
+  `weatherApi.ts` pide de verdad.
+- **Qué encontré o decidí yo:** Al ejecutar `npx vitest run` por primera
+  vez, la prueba falló con `Cannot read properties of undefined (reading
+  '0')` en `feelsLikeMax`. El fixture se guardó en el bloque 02, con solo
+  las 3 variables de D-01. D-11 llegó dos bloques después y amplió la
+  petición real a 6 variables, pero nadie volvió a regenerar el archivo
+  guardado — quedó desincronizado en silencio, sin que ningún error lo
+  avisara hasta este momento.
+- **Cómo se resolvió:** Se regeneró `docs/api-sample.json` contra la API
+  real con las 6 variables actuales. Una segunda prueba (caso 4, "sin datos
+  diarios") también falló, pero por un motivo distinto y propio: el payload
+  de prueba tenía longitud 1, así que disparaba la validación de conteo de
+  ciudades antes de llegar a la validación que se quería probar. Se corrigió
+  a 9 entradas sin campo `daily`, para ejercitar de verdad el caso que decía
+  probar.
+- **Por qué:** Un fixture guardado en disco no se actualiza solo cuando el
+  código que lo consume cambia — nada los mantiene sincronizados salvo una
+  prueba que se ejecute y falle. Es la misma familia de problema que E-06 (un
+  hook mal configurado que no falla) pero en dirección contraria: aquí la
+  prueba sí falló, que es exactamente lo que tiene que pasar cuando el
+  supuesto detrás de un test deja de ser cierto.
+- **Fuente:** —
+- **Quién tenía razón:** —
+- **¿Va al README?** Sí — «un ejemplo generado por IA que tuviste que
+  revisar o corregir»

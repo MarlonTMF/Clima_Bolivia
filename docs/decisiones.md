@@ -358,9 +358,21 @@ sobre-ingeniería que el desafío penaliza, solo que con bata de laboratorio. El
 trabajo de calidad no es acumular pruebas: es decidir dónde se concentra el
 riesgo y justificar el resto.
 
-**Consecuencia.** El fixture de las pruebas es la respuesta real guardada en el
-bloque 02, no un JSON inventado — así verifican contra datos verdaderos en
-lugar de contra las propias suposiciones.
+**Consecuencia.** El fixture de las pruebas es la respuesta real de la API,
+no un JSON inventado — así verifican contra datos verdaderos en lugar de
+contra las propias suposiciones.
+
+**Corrección al implementar (16-09-2026).** El fixture original de
+`docs/api-sample.json`, guardado en el bloque 02, solo tenía los 3 campos de
+D-01 (weather_code, max, min) — D-11 llegó después y añadió sensación
+térmica y viento a la petición real, pero nadie regeneró el fixture. La
+primera ejecución de las pruebas del bloque 08 lo detectó de inmediato: el
+mapeo fallaba con `feelsLikeMax` undefined, porque el fixture no tenía esos
+campos y `weatherApi.ts` sí los pide. Se regeneró el fixture con las 6
+variables reales. Es la razón por la que un fixture guardado en disco puede
+quedar obsoleto silenciosamente cuando el código que lo consume cambia
+después: no hay ningún mecanismo automático que los mantenga sincronizados,
+solo la prueba que falla al ejecutarse.
 
 ---
 
