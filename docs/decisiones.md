@@ -194,6 +194,15 @@ muestra el pronóstico de una ciudad bajo el nombre de otra.
 En la muestra del 15-09-2026: La Paz mínima -2.3 °C y Cobija máxima 32.2 °C el
 mismo día. Si todas se parecen, el orden está mal.
 
+**Añadido al implementar (16-09-2026).** La respuesta de Open-Meteo incluye un
+campo `elevation` por ubicación: la altitud real del punto de modelo. Se usa
+esa cifra —verificada por la misma fuente que ya consumimos— en vez de
+cualquier valor buscado aparte. Difiere ligeramente de las cifras aproximadas
+usadas en la fase de planificación (Oruro 3706→3925 m, Potosí 4067→3962 m):
+las de la API son las correctas y las que se citan de aquí en adelante.
+`elevationM` se guarda como campo estático en `City` (D-06), igual que las
+coordenadas — no se vuelve a pedir en cada carga.
+
 ---
 
 ## D-06 · Separación entre la respuesta de la API y el modelo de la aplicación

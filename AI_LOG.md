@@ -352,3 +352,28 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** —
 - **Quién tenía razón:** —
 - **¿Va al README?** No — detalle operativo menor, no aporta a los 6 puntos
+
+---
+
+## E-10 · La altitud no había que buscarla: ya estaba en la respuesta
+- **Fecha / bloque:** 16-09-2026 · Bloque 06
+- **Tipo:** criterio propio
+- **Herramienta:** revisión propia del payload guardado
+- **Qué propuso la IA:** —
+- **Qué encontré o decidí yo:** Antes de escribir `cities.ts` revisé de nuevo
+  `docs/api-sample.json` y noté que cada entrada trae un campo `elevation`:
+  la altitud real del punto de modelo, calculada por el mismo proveedor que
+  ya usamos. No hacía falta buscar la cifra en ningún otro sitio.
+- **Cómo se resolvió:** `City.elevationM` se llena con ese valor. Difiere de
+  las cifras aproximadas que se habían usado como narrativa en la fase de
+  planificación (antes de tener la API real): Oruro pasa de 3706 a 3925 m,
+  Potosí de 4067 a 3962 m. Se actualizó D-05 con la nota y con el origen de
+  la cifra correcta.
+- **Por qué:** Es el mismo principio que ya aplicamos con el fixture de las
+  pruebas (D-10): cuando la fuente que ya estás consumiendo trae el dato,
+  usar esa fuente es más barato y más defendible que buscarlo aparte —una
+  llamada menos que justificar, y un número que coincide exactamente con el
+  resto de los datos de la app en vez de venir de una tabla distinta.
+- **Fuente:** docs/api-sample.json (campo "elevation" de la respuesta real)
+- **Quién tenía razón:** —
+- **¿Va al README?** No — detalle de implementación, no de proceso con IA
