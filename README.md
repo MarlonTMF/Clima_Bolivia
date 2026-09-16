@@ -254,6 +254,137 @@ AI_LOG.md                   bitácora de uso de IA, con las correcciones
 
 ---
 
+## AI Usage
+
+Todo lo que sigue sale de [`AI_LOG.md`](AI_LOG.md), una bitácora con **21
+entradas** escritas durante el desarrollo, no reconstruidas al final. Cada
+una registra qué propuso la herramienta, qué encontré al comprobarlo, cómo se
+resolvió y por qué. Esta sección es un resumen; el detalle está allí.
+
+### Qué herramientas y para qué
+
+| Herramienta | Uso |
+|---|---|
+| **Claude Code** | Asistente principal durante todo el desarrollo: código, documentación y verificación conduciendo un navegador real |
+| **Google Stitch** | Referencia visual de las cuatro pantallas. **Su código no entró al proyecto** |
+| **Subagente revisor propio** | Definido en `.claude/agents/revisor.md`, con permisos de sólo lectura, para revisar `src/` antes de entregar |
+| **Búsqueda web** | Verificar contra documentación oficial cada dato de API, límites y precios |
+
+### Cómo la usé
+
+Con una regla de fondo: **la IA propone, yo verifico, y lo que entra al
+repositorio es responsabilidad mía**. En la práctica eso fue:
+
+- Escribir las decisiones cuando se tomaban, con contexto y alternativas, en
+  vez de justificar al final lo ya hecho.
+- Comprobar contra la fuente todo dato de versiones, límites o precios.
+- Verificar el **efecto** y no el artefacto: mirar el píxel, no la regla CSS;
+  comprobar qué hizo el comando, no que terminara sin error.
+- Registrar en la bitácora cada corrección **y también los casos en que la
+  herramienta tenía razón y yo no**. Un registro donde la persona siempre
+  acierta se lee como fabricado.
+
+### Un ejemplo que tuve que corregir
+
+Para justificar la elección de API, la herramienta redactó este párrafo:
+
+> «El endpoint de 7 días de OpenWeather (One Call 3.0) exige registrar tarjeta
+> de crédito.»
+
+Suena plausible y **tenía dos problemas**. La versión vigente es **One Call
+API 4.0**, no la 3.0. Y la página oficial de precios describe un modelo *pay
+as you call* con 1 000 llamadas diarias gratuitas, **sin mencionar en ningún
+punto la exigencia de tarjeta**: la afirmación era más fuerte que la
+evidencia.
+
+Un número de versión y una condición comercial son justo la clase de dato que
+un modelo genera por patrón en vez de consultar — suenan bien porque son lo
+que el dato *debería* ser, y además envejecen: la 3.0 fue correcta en algún
+momento. **Ningún compilador ni prueba habría detectado ese error**; habría
+llegado intacto al README y sólo se habría caído si alguien lo cuestionaba.
+
+Hay un matiz que también quedó registrado: al retirar la afirmación me pasé
+de frenada. Retirar algo por falta de evidencia es correcto, pero **no
+equivale a declararlo falso**, y la investigación posterior mostró que
+apuntaba en la dirección correcta. La lección no fue «verifica más» sino
+distinguir tres estados —confirmado, refutado y sin evidencia— y redactar
+cada uno con las palabras que le corresponden.
+
+### Una sugerencia que decidí no utilizar
+
+El subagente revisor señaló que `Math.round(-2.5)` devuelve `-2` y no `-3`,
+porque JavaScript redondea hacia +∞. **Es cierto, y lo comprobé.** Aun así no
+lo apliqué: el caso sólo se dispara en un empate exacto de medio grado, el
+desvío es de medio grado, y corregirlo pedía una función de redondeo propia.
+Añadir código para eso es exactamente la sobre-ingeniería que el enunciado
+pide evitar.
+
+Es el descarte que mejor ilustra el criterio, precisamente porque **la
+sugerencia era técnicamente correcta**: rechazarla no fue detectar un error
+suyo, fue decidir que el arreglo costaba más de lo que valía.
+
+El otro descarte grande fue estructural: el código que exportó Stitch. Traía
+Tailwind, una librería de iconos y cientos de líneas de marcado que no podría
+explicar clase por clase. Se tomó el diseño como especificación visual y se
+implementó a mano.
+
+### Qué requirió más razonamiento propio
+
+**La decisión del backend, que cambió tres veces.** Primero se descartó, luego
+se revirtió al encontrar dos fallos reales en ese razonamiento —tratar la
+disponibilidad del proveedor como problema ajeno, y una objeción sobre
+arranques en frío que describía otra plataforma—, se diseñó por completo, y
+finalmente **se decidió no construirlo**: el problema de resiliencia era real,
+pero la solución desproporcionada para este alcance. Cada vuelta incorporó
+información que la anterior no tenía, y la tercera fue la propia aplicación
+terminada y verificada.
+
+**Y decidir qué NO probar, qué NO añadir y qué NO construir.** Es donde la
+herramienta ayuda menos: siempre puede proponer una prueba más, una
+abstracción más o una capa más, y ninguna de esas propuestas viene marcada
+como innecesaria.
+
+### Cómo valido los resultados
+
+Al revisar la bitácora entera apareció que los errores del proyecto **no eran
+variados: eran ocho instancias del mismo tipo**. Código válido que no produce
+ningún error y simplemente no hace nada — una clase CSS inexistente, un
+contorno de foco sobre `opacity: 0`, un `flex-direction` en un contenedor
+`grid`, Testing Library que nunca desmontaba y hacía que las pruebas pasaran
+por casualidad.
+
+La causa común era **verificar el artefacto en vez del efecto**. La
+consecuencia fue `npm run audit`, seis comprobaciones automáticas, una por
+cada categoría que se dio aquí — y verificadas reintroduciendo los errores
+uno a uno para comprobar que la auditoría los detecta de verdad.
+
+Las otras tres reglas que salieron de ahí:
+
+1. **Una prueba no vale hasta verla fallar.** La del orden de las ciudades se
+   comprobó invirtiéndolo a propósito: al hacerlo, las otras seis del archivo
+   seguían en verde. Esa era exactamente la razón de escribirla.
+2. **Ninguna cifra sin medir.** El peso del paquete se estimó en ~42 KB y
+   midió 68,60. El tiempo de carga se estimó en 280–760 ms y midió ~1 700.
+3. **Si un arreglo no funciona, aislar en vez de encadenar otro.** Con el
+   fallo de Testing Library, dos intentos basados en una hipótesis equivocada
+   costaron más que mover la prueba a un archivo propio, que dio la respuesta
+   exacta en dos minutos.
+
+### Qué salió mal, dicho sin adornos
+
+Tres de las cuatro pantallas del diseño estuvieron **sin implementar durante
+cuatro bloques** y lo detecté mirando la aplicación, no ninguna verificación.
+El motivo es instructivo: todas las comprobaciones esperaban a que
+aparecieran los datos, así que **se saltaban por construcción los estados de
+carga y de error**. Y el título de la pestaña estuvo diciendo `scaffold` —el
+valor de la plantilla de Vite— hasta que lo encontró el revisor delegado, con
+la aplicación ya en producción.
+
+Ninguna de las dos cosas la encontró una herramienta automática. Las dos están
+en la bitácora con su fecha.
+
+---
+
 ## Créditos
 
 - Datos meteorológicos: [Open-Meteo](https://open-meteo.com/), CC-BY 4.0.
