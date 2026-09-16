@@ -333,8 +333,12 @@ body {
   .city-picker__body {
     grid-template-columns: 1fr;
   }
+  /* El mapa se mantiene en móvil (pedido explícito del usuario) — se
+     apoya en aspect-ratio para escalar sin desbordar; a una columna
+     queda sobre la tarjeta de ciudad en vez de al lado. */
   .country-map {
-    display: none;
+    max-width: 280px;
+    margin: 0 auto var(--space-md);
   }
 }
 
@@ -578,8 +582,11 @@ body {
     margin: 0;
     gap: var(--space-sm);
   }
+  /* Pedido explícito: sin la etiqueta, los dos números de cada fila
+     móvil se leían ambiguos (¿cuál es máxima, cuál mínima?). Se muestra
+     más pequeña que en escritorio para que quepa en la fila compacta. */
   .forecast-card__temp-label {
-    display: none; /* la referencia móvil no repite MÁX/MÍN en cada fila */
+    font-size: 0.55rem;
   }
   .forecast-card__feels,
   .forecast-card__wind {
