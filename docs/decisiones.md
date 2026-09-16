@@ -429,3 +429,32 @@ Tres cosas que el plan daba por supuestas y la realidad corrigió al ejecutar
 
 El tercero es el importante: un hook con el comando equivocado no falla, pasa
 —y da confianza falsa durante todo el proyecto, que es peor que no tener hook.
+
+---
+
+## D-11 · Variables diarias ampliadas: sensación térmica y viento sí, humedad y presión no
+
+**Contexto.** Al revisar el diseño generado en Stitch, aparecieron cuatro
+métricas nuevas en la pantalla: sensación térmica, viento, humedad y presión.
+Se pidió investigar cuáles de las cuatro admite Open-Meteo a granularidad
+diaria antes de decidir si se incorporan.
+
+**Decisión.** Se añaden `apparent_temperature_max/min` (sensación térmica) y
+`wind_speed_10m_max` (viento) a la petición de D-01. **Humedad y presión
+quedan fuera** de esta iteración.
+
+**Razón.** Verificado contra open-meteo.com/en/docs: `apparent_temperature_*`
+y `wind_speed_10m_max` sí existen como variables `daily`, mismo endpoint y
+mismo formato que las que ya usamos — coste marginal cero. Humedad
+(`relative_humidity_2m`) y presión (`surface_pressure`, `pressure_msl`) **solo
+existen a granularidad horaria**. Para mostrarlas por día habría que pedir 24
+valores por ciudad y promediarlos nosotros, lo que añade una transformación de
+datos que D-06 evita deliberadamente (la API entrega los datos ya agregados
+por día; no queremos ser nosotros quienes agreguemos).
+
+**Consecuencia.** `DayForecast` (D-06) gana dos campos opcionales:
+`feelsLikeMax`, `feelsLikeMin` y `windMax`. El prompt de diseño para Stitch
+pide estos dos datos con valores reales; humedad y presión se retiran del
+diseño.
+
+**Verificado el.** 15-09-2026, contra open-meteo.com/en/docs.
