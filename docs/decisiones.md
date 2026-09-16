@@ -488,3 +488,26 @@ pide estos dos datos con valores reales; humedad y presión se retiran del
 diseño.
 
 **Verificado el.** 15-09-2026, contra open-meteo.com/en/docs.
+
+---
+
+## Despliegue
+
+**URL de producción:** https://clima-bolivia-theta.vercel.app/
+
+**Desplegado el.** 16-09-2026, bloque 09. Plataforma Vercel, plan Hobby
+(ver D-09 sobre por qué no hace falta pagar). Framework detectado
+automáticamente (Vite), sin variables de entorno.
+
+**Verificado tras el despliegue** (Playwright headless, no solo mirar la
+pantalla): 9 ciudades, 7 días cada una, sin errores de consola, sin scroll
+horizontal a 375 px, primer día correcto (2026-09-16, sin desfase de zona
+horaria) — en escritorio y en viewport móvil.
+
+**Dato curioso, sin sobre-interpretar.** La cabecera `X-Vercel-Id` de la
+respuesta muestra `gru1` (São Paulo): el CDN de Vercel ya sirve el HTML
+estático desde el borde más cercano a Sudamérica por defecto, sin que se
+haya configurado nada. Esto es distinto de la región de la *función*
+serverless (D-09), que se fija explícitamente en `vercel.json` y solo
+importa cuando exista `api/forecast.ts` (bloque 14) — no confundir las dos
+cosas.
