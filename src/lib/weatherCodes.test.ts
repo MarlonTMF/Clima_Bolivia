@@ -14,7 +14,7 @@ describe("describeWeatherCode", () => {
 
   it("devuelve un valor neutro ante un código desconocido", () => {
     // La API puede añadir códigos nuevos: la tarjeta no debe romperse.
-    // icon es una clave semántica (WeatherIconKey), no un emoji — ver D-XX
+    // icon es una clave semántica (WeatherIconKey), no un emoji — ver D-12,
     // "iconos propios en vez de emoji".
     expect(describeWeatherCode(999)).toEqual({ label: "Sin datos", icon: "unknown" });
   });

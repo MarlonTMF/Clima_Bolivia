@@ -520,3 +520,58 @@ algo fuera de estas paradas se registra igual.
 - **¿Va al README?** Sí — es el ejemplo más claro de «una sugerencia de la
   IA que rechazaste o corregiste», con la particularidad de que fue una
   decisión de la propia IA revertida dos veces sobre el mismo punto.
+
+---
+
+## E-15 · La revisión delegada encontró el título de la plantilla en producción
+- **Fecha / bloque:** 16-09-2026 · Bloque 15
+- **Tipo:** corrección / delegación
+- **Herramienta:** subagente revisor propio (`.claude/agents/revisor.md`)
+- **Qué propuso la IA:** Diez hallazgos sobre `src/`, ordenados por
+  severidad. El subagente corre con contexto propio: lee los archivos
+  completos y devuelve solo la lista, sin que el contenido de los archivos
+  entre en la conversación principal.
+- **Qué encontré o decidí yo:** Verifiqué los diez uno por uno contra el
+  código antes de aceptar ninguno, y el resultado fue desigual. **Dos eran
+  graves y ciertos:** (1) `index.html` seguía teniendo
+  `<title>scaffold</title>`, el valor de la plantilla de Vite — estaba en
+  producción, es lo primero que ve cualquiera que abra la pestaña; (2) el
+  contorno de foco del selector de ciudad era invisible, porque estaba
+  aplicado sobre un `<select>` con `opacity: 0`, y `opacity` afecta al
+  elemento entero incluido su `outline`. El comentario del CSS afirmaba
+  justo lo contrario. **Descarté uno** (ver abajo) y acepté el resto tras
+  comprobarlos.
+- **Cómo se resolvió:** Nueve hallazgos aplicados, uno descartado. El del
+  foco se verificó empíricamente antes y después: capturas de la tarjeta
+  con y sin foco, idénticas píxel a píxel antes del arreglo, distintas
+  después. El del orden de la petición se resolvió con una aserción nueva
+  en `weatherApi.test.ts`, y **se comprobó que la prueba falla de verdad**
+  invirtiendo el orden a propósito — al hacerlo, las otras seis pruebas del
+  archivo siguieron pasando, que es exactamente el fallo silencioso que
+  D-05 describe.
+- **Qué descarté, y por qué:** el hallazgo sobre `Math.round` con
+  temperaturas negativas. Es cierto que `Math.round(-2.5)` da `-2` y no
+  `-3`, porque redondea hacia +∞. Pero el caso solo se dispara en un empate
+  exacto de medio grado, el desvío es de medio grado, y corregirlo pedía
+  una función de redondeo propia. **Añadir código para eso es justo la
+  sobre-ingeniería que el enunciado penaliza**, y el propio revisor lo
+  admitía: «si no se toca, dejarlo». Lo notable es que la sugerencia era
+  técnicamente correcta: descartarla no fue detectar un error suyo, sino
+  decidir que el arreglo costaba más de lo que valía.
+- **Por qué:** El valor de delegar no fue que el revisor supiera más que
+  yo, sino que **no tenía el contexto de haber escrito el código**. Yo
+  había mirado `index.html` varias veces sin leer el `<title>`, porque
+  sabía lo que esperaba encontrar. Un revisor sin ese sesgo lo ve a la
+  primera. La contrapartida es que tampoco tiene el contexto del proyecto:
+  por eso la definición del subagente lista las decisiones cerradas que no
+  debe reabrir, y por eso los diez hallazgos se verificaron antes de
+  aplicar ninguno — aceptar la lista entera habría sido delegar el criterio,
+  no el trabajo.
+- **Detalle operativo:** un subagente definido en `.claude/agents/` no está
+  disponible en la misma sesión en que se crea; se carga al arrancar. La
+  revisión se ejecutó pasando la misma definición a un agente genérico.
+- **Fuente:** —
+- **Quién tenía razón:** El revisor en nueve de diez, y en los dos graves
+  sin discusión. Yo en el descarte del décimo.
+- **¿Va al README?** Sí — «una sugerencia de la IA que decidiste no
+  utilizar» y «cómo validas los resultados».

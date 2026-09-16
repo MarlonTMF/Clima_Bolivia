@@ -140,7 +140,8 @@ descartar, no como medida.
 **Contexto.** Diez archivos, un `fetch`, una vista.
 
 **Decisión.** Sin router, sin gestor de estado, sin cliente HTTP, sin librería
-de CSS ni de iconos. `fetch` nativo, `useState`, CSS propio y emoji.
+de CSS ni de iconos. `fetch` nativo, `useState`, CSS propio y SVG escritos a
+mano para los iconos (los emoji iniciales se retiraron en D-12).
 
 **Razón.** Cada dependencia es una decisión que hay que defender y una
 superficie que explicar. Un router para una sola vista, un gestor de estado
@@ -231,16 +232,16 @@ igual, se hayan materializado o no.
 
 ---
 
-## D-07 · Agrupación de los códigos WMO en siete categorías
+## D-07 · Agrupación de los códigos WMO en ocho categorías
 
 **Contexto.** Open-Meteo devuelve el estándar WMO 4677: unos treinta códigos
 numéricos, sin descripción textual.
 
-**Decisión.** Agruparlos en siete categorías legibles, con un valor neutro por
+**Decisión.** Agruparlos en ocho categorías legibles, con un valor neutro por
 defecto para códigos desconocidos.
 
 **Razón.** Es una decisión de producto, no técnica: un usuario no necesita
-distinguir «llovizna helada ligera» de «llovizna helada densa». Las siete
+distinguir «llovizna helada ligera» de «llovizna helada densa». Las ocho
 categorías son despejado, parcialmente nublado, nublado, niebla, llovizna,
 lluvia, nieve y tormenta.
 
@@ -708,7 +709,7 @@ cambio visible, verificado). Es el precio de un mapa real en vez de una
 aproximación — se acepta porque el usuario lo pidió explícitamente tras
 rechazar la alternativa ligera.
 
-## Iconos propios en vez de emoji
+## D-12 · Iconos propios en vez de emoji
 
 Pedido explícito: los emoji (☀️🌦️💨📍) se leen inconsistentes entre
 sistemas operativos y poco profesionales. Se reemplazaron por SVG propios
@@ -724,3 +725,57 @@ en tiempo de compilación que `weatherCodes.ts` solo puede devolver una de
 esas 9 claves — un error tipográfico en la clave ya no puede llegar a
 producción silenciosamente, como sí podía pasar con un string de emoji
 suelto.
+
+---
+
+## Revisión delegada (bloque 15)
+
+Un subagente revisor (`.claude/agents/revisor.md`) leyó `src/` completo y
+devolvió diez hallazgos. Se verificaron uno por uno contra el código antes de
+aplicar ninguno; nueve se aplicaron y uno se descartó.
+
+**Los dos graves, ambos ciertos:**
+
+1. **`index.html` seguía con `<title>scaffold</title>`**, el valor de la
+   plantilla de Vite, y estaba así en producción. Es lo primero que ve
+   cualquiera que abra la pestaña o guarde el marcador. Ahora es
+   «Clima Bolivia — Pronóstico de 7 días».
+2. **El foco de teclado del selector de ciudad era invisible.** El contorno
+   estaba aplicado a `.city-card__select`, que lleva `opacity: 0` para que el
+   `<select>` nativo cubra la tarjeta sin verse. `opacity` se aplica al
+   elemento entero **incluido su `outline`**, así que el contorno se dibujaba
+   transparente. Verificado con capturas de la tarjeta con y sin foco:
+   idénticas píxel a píxel. El contorno se movió a `.city-card` mediante
+   `:has()`, y las capturas ahora difieren.
+
+   Esto contradice el punto «foco visible en todo lo interactivo» que la nota
+   de accesibilidad del bloque 12 daba por cumplido. **Lo estaba en el CSS y
+   no en la pantalla**: revisar la regla no bastaba, hacía falta mirar el
+   resultado.
+
+**Los siete menores aplicados:** clase `.city-selector__elevation` huérfana
+(el componente usa `city-card__elevation`, así que la regla móvil no se
+aplicaba); el número grande del panel «hoy» sin etiqueta, que lo hacía leer
+como temperatura actual —el dato que esta app deliberadamente no tiene—,
+resuelto con «MÁXIMA DE HOY» igual que las tarjetas llevan MÁX/MÍN; un
+comentario en `weatherApi.ts` que anunciaba el proxy del bloque 14 ya
+cancelado; el favicon, que era un emoji y contradecía D-12; el `aria-label`
+de la grilla, que prometía «7 días» de forma literal mientras el número de
+tarjetas era `days.length`; y en este documento, D-07 decía «siete
+categorías» enumerando ocho, más un marcador `D-XX` sin resolver en una
+prueba —la decisión de iconos existía sin numerar y pasa a ser **D-12**.
+
+**Lo que se descartó, con razón:** `Math.round(-2.5)` devuelve `-2` y no
+`-3`, porque redondea hacia +∞. Es cierto, pero solo se dispara en un empate
+exacto de medio grado y corregirlo pedía una función de redondeo propia.
+Añadir código para eso es la sobre-ingeniería que el enunciado penaliza.
+La sugerencia era técnicamente correcta: descartarla no fue detectar un
+error, fue decidir que el arreglo costaba más de lo que valía.
+
+**La prueba que faltaba.** El revisor señaló que nada verificaba el orden de
+la petición, que es la trampa que D-05 describe: si la URL se construyera
+desde otra lista, cada ciudad mostraría el clima de otra **sin que falle
+nada**. Se añadió una aserción que compara los parámetros `latitude` y
+`longitude` contra `CITIES`. Y se comprobó que la prueba sirve, invirtiendo
+el orden a propósito: falla. **Al hacerlo, las otras seis pruebas del archivo
+siguieron pasando** — la demostración exacta de por qué hacía falta.

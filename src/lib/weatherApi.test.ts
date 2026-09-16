@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { fetchForecasts } from "./weatherApi";
+import { CITIES } from "../data/cities";
 import sample from "../../docs/api-sample.json";
 
 afterEach(() => {
@@ -30,6 +31,24 @@ describe("fetchForecasts", () => {
     const potosi = result.find((f) => f.city.id === "potosi")!;
     const santaCruz = result.find((f) => f.city.id === "santa-cruz")!;
     expect(Math.abs(potosi.days[0].maxTemp - santaCruz.days[0].maxTemp)).toBeGreaterThan(3);
+  });
+
+  it("pide las coordenadas en el mismo orden que CITIES (D-05)", async () => {
+    // La trampa del proyecto: la respuesta llega como array en el orden de
+    // la petición, así que si la URL se construyera desde otra lista, cada
+    // ciudad mostraría el clima de otra SIN que falle nada. Ninguna prueba
+    // miraba la URL, así que un desajuste pasaba en verde. Esto lo fija.
+    let pedida = "";
+    mockFetch((url) => {
+      pedida = String(url);
+      return new Response(JSON.stringify(sample), { status: 200 });
+    });
+
+    await fetchForecasts();
+
+    const params = new URL(pedida).searchParams;
+    expect(params.get("latitude")).toBe(CITIES.map((c) => c.latitude).join(","));
+    expect(params.get("longitude")).toBe(CITIES.map((c) => c.longitude).join(","));
   });
 
   it("falla con mensaje claro ante un HTTP 500 (caso 2)", async () => {

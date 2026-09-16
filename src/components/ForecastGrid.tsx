@@ -19,7 +19,7 @@ export function ForecastGrid({ forecast }: Props) {
   const today = todayInBolivia();
 
   return (
-    <section className="forecast-grid" aria-label={`Pronóstico de 7 días para ${forecast.city.name}`}>
+    <section className="forecast-grid" aria-label={`Pronóstico de ${forecast.days.length} días para ${forecast.city.name}`}>
       {forecast.days.map((day) => (
         <ForecastCard key={day.date} day={day} isToday={day.date === today} />
       ))}

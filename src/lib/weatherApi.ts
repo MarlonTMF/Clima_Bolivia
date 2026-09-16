@@ -3,9 +3,10 @@ import { describeWeatherCode } from "./weatherCodes";
 import type { CityForecast, DayForecast } from "../types";
 
 /**
- * Llamada directa a Open-Meteo (D-01). Cuando el proxy con caché (D-09) se
- * implemente en el bloque 14, esta es la ÚNICA línea que cambia — el resto
- * de este archivo no se entera, gracias a la separación de D-06.
+ * Llamada directa a Open-Meteo (D-01), sin backend en medio. Si algún día
+ * se antepusiera un proxy (D-09: diseñado y finalmente descartado) o se
+ * cambiara de proveedor, esta es la ÚNICA línea que cambia — el resto de
+ * este archivo no se entera, gracias a la separación de D-06.
  */
 const BASE_URL = "https://api.open-meteo.com/v1/forecast";
 const TIMEOUT_MS = 10_000;

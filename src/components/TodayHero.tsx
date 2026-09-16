@@ -29,7 +29,13 @@ export function TodayHero({ forecast }: Props) {
         </p>
       </div>
       <div className="today-hero__reading">
-        <span className="today-hero__temp">{today.maxTemp}°</span>
+        <div className="today-hero__temp-block">
+          {/* La etiqueta no es decorativa: sin ella el número grande se lee
+              como la temperatura actual, que es justo el dato que esta app
+              no tiene. Mismo arreglo que las tarjetas (MÁX/MÍN). */}
+          <span className="today-hero__temp-label">MÁXIMA DE HOY</span>
+          <span className="today-hero__temp">{today.maxTemp}°</span>
+        </div>
         <div className="today-hero__details">
           <span>Sensación {today.feelsLikeMax}°</span>
           <span className="today-hero__wind">

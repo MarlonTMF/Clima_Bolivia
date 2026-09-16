@@ -5,21 +5,25 @@ Desafío técnico: se evalúa **simplicidad y criterio**, no volumen de
 funcionalidad. El enunciado dice explícitamente que buscan una solución «que
 puedas explicar».
 
-**Las decisiones están escritas en `docs/decisiones.md` (D-01 a D-10). Léelo
+**Las decisiones están escritas en `docs/decisiones.md` (D-01 a D-12). Léelo
 antes de proponer cambios de arquitectura; están cerradas y no se reabren sin
 una razón nueva.**
 
 ## Stack
 
 React 19 + TypeScript + Vite. CSS plano. `oxlint` como linter (viene con la
-plantilla de Vite; no es ESLint). Despliegue en Vercel: frontend estático más
-una función serverless en `api/`.
+plantilla de Vite; no es ESLint). Despliegue en Vercel: **sitio estático, sin
+backend**. El navegador llama a Open-Meteo directamente. Se diseñó una función
+serverless de proxy con caché y finalmente **no se construyó** (D-09): no
+existe `api/forecast.ts` ni `vercel.json`.
 
 ## Reglas del proyecto
 
 **Dependencias.** No añadir ninguna de producción sin preguntar antes (D-03).
 Sin router, sin gestor de estado, sin cliente HTTP, sin librería de CSS ni de
-iconos. `fetch` nativo, `useState`, CSS propio y emoji. Las de prueba
+iconos. `fetch` nativo, `useState`, CSS propio y **SVG propios** para los
+iconos — nada de emoji en la interfaz: se reemplazaron porque restaban
+profesionalidad. Las de prueba
 (`devDependencies`) sí están permitidas: no llegan al bundle.
 
 **La API.** No inventar nombres de parámetros. Los verificados son
@@ -41,9 +45,10 @@ componentes solo conocen ese modelo (D-06).
 siempre usar `AbortController` con timeout. Los cinco casos cubiertos son: red
 caída, HTTP no-OK, timeout, JSON con forma inesperada y código WMO desconocido.
 
-**La caché del proxy.** En `api/forecast.ts`, las respuestas correctas llevan
-cabeceras de caché; **los fallos van siempre con `no-store`** (D-09). Cachear un
-error dejaría la aplicación rota durante toda la ventana de caché.
+**Sin caché de ningún tipo.** `App.tsx` hace un solo `fetch` al montar y no
+vuelve a pedir nada; no hay proxy, ni cabeceras de caché, ni `localStorage`
+(D-09). Cualquier texto de interfaz que prometa una frecuencia de
+actualización sería falso.
 
 **Textos de interfaz.** En español, directos, sin disculpas. Un mensaje de error
 dice qué pasó y qué hacer, nunca un código HTTP suelto.
