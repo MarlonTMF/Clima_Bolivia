@@ -6,6 +6,7 @@ import { TodayHero } from "./components/TodayHero";
 import { ForecastGrid } from "./components/ForecastGrid";
 import { LoadingState } from "./components/LoadingState";
 import { ErrorState } from "./components/ErrorState";
+import { WeatherIcon } from "./components/icons/WeatherIcon";
 import type { CityForecast } from "./types";
 
 export default function App() {
@@ -40,7 +41,9 @@ export default function App() {
     <>
       <header className="site-header">
         <div className="site-header__brand">
-          <span className="site-header__icon" aria-hidden="true">☀️</span>
+          <span className="site-header__icon">
+            <WeatherIcon code="clear" size={20} />
+          </span>
           <strong>BOLIVIA CLIMA</strong>
           <span className="site-header__divider" aria-hidden="true" />
           <span className="site-header__tag">Pronóstico meteorológico departamental</span>

@@ -15,9 +15,25 @@ export type City = {
   elevationM: number;
 };
 
+/**
+ * Claves de icono, no emoji (pedido explícito: los emoji se leen
+ * inconsistentes entre sistemas y poco profesionales). Cada clave se
+ * renderiza con un SVG propio — ver src/components/icons/WeatherIcon.tsx.
+ */
+export type WeatherIconKey =
+  | "clear"
+  | "partly-cloudy"
+  | "cloudy"
+  | "fog"
+  | "drizzle"
+  | "rain"
+  | "snow"
+  | "storm"
+  | "unknown";
+
 export type Condition = {
   label: string;
-  icon: string;
+  icon: WeatherIconKey;
 };
 
 export type DayForecast = {

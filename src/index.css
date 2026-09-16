@@ -72,8 +72,8 @@ body {
   flex-wrap: wrap;
 }
 .site-header__icon {
-  font-size: 1.1rem;
-  line-height: 1;
+  display: flex;
+  color: #ffd166;
   flex: none;
 }
 .site-header__brand strong {
@@ -182,61 +182,59 @@ body {
   align-items: start;
 }
 
-/* mapa: decorativo, se oculta en móvil (la referencia móvil de Stitch
-   tampoco lo incluye — ver docs/design/tokens.md). Los botones que sí
-   seleccionan ciudad viven en HTML normal (.country-map__hotspots), el
-   <svg> es puramente visual. */
+/*
+ * Mapa real de los 9 departamentos (src/data/bolivia-map.ts), no una
+ * silueta dibujada a mano — ver la cabecera de CountryMap.tsx para la
+ * fuente y atribución. Se oculta en móvil (la referencia móvil de Stitch
+ * tampoco lo incluye — docs/design/tokens.md).
+ */
 .country-map {
-  position: relative;
-  background: var(--color-accent-soft);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
   border-radius: var(--radius);
   overflow: hidden;
-  aspect-ratio: 220 / 260;
+  aspect-ratio: 1342.633 / 1488.904;
 }
 .country-map__svg {
   width: 100%;
   height: 100%;
   display: block;
 }
-.country-map__silhouette {
-  fill: #bfe0f5;
-  stroke: #93c9e8;
-  stroke-width: 1.5;
-}
-.country-map__dot {
-  fill: var(--color-accent);
-  opacity: 0.55;
-}
-.country-map__dot--active {
-  fill: var(--color-accent-text);
-  opacity: 1;
-  stroke: white;
+.country-map__outline {
+  fill: var(--color-ground);
+  stroke: var(--color-line);
   stroke-width: 2;
 }
-.country-map__dot-label {
-  font-size: 8px;
+.country-map__dept {
+  fill: var(--color-accent-soft);
+  stroke: var(--color-surface);
+  stroke-width: 4;
+  cursor: pointer;
+  transition: fill 0.12s ease;
+}
+.country-map__dept:hover {
+  fill: var(--color-accent-line, #93c9e8);
+}
+.country-map__dept:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: -2px;
+}
+.country-map__dept--active {
+  fill: var(--color-accent);
+}
+.country-map__dept--active:hover {
+  fill: var(--color-accent);
+}
+.country-map__label {
+  font-size: 42px;
   font-family: var(--font-sans);
   font-weight: 700;
-  fill: var(--color-ink);
-  text-anchor: middle;
-}
-.country-map__hotspots {
-  position: absolute;
-  inset: 0;
-}
-.country-map__hotspot {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  margin: -11px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-}
-.country-map__hotspot:hover {
-  background: rgba(2, 132, 199, 0.12);
+  fill: white;
+  paint-order: stroke;
+  stroke: rgba(15, 23, 42, 0.55);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 
 .city-card {
@@ -355,11 +353,18 @@ body {
   margin-bottom: var(--space-lg);
 }
 .today-hero__caption {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   margin: 0 0 var(--space-xs);
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-ink-soft);
+}
+.today-hero__caption svg {
+  flex: none;
+  color: var(--color-accent);
 }
 .today-hero__city {
   margin: 0;
@@ -367,8 +372,15 @@ body {
   font-weight: 700;
 }
 .today-hero__condition {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin: var(--space-sm) 0 0;
   font-size: 1rem;
+}
+.today-hero__condition svg {
+  flex: none;
+  color: var(--color-accent);
 }
 .today-hero__reading {
   display: flex;
@@ -392,7 +404,13 @@ body {
   color: var(--color-ink-soft);
 }
 .today-hero__wind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   white-space: nowrap;
+}
+.today-hero__wind svg {
+  color: var(--color-ink-faint, var(--color-ink-soft));
 }
 
 /* ---------- grilla de 7 días ---------- */
@@ -439,9 +457,9 @@ body {
   margin: var(--space-sm) 0;
 }
 .forecast-card__icon {
-  display: block;
-  font-size: 1.75rem;
-  line-height: 1;
+  display: flex;
+  justify-content: center;
+  color: var(--color-accent);
 }
 .forecast-card__condition-label {
   display: block;
@@ -494,6 +512,10 @@ body {
   margin: 0.25rem 0 0.15rem;
 }
 .forecast-card__wind {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-size: 0.72rem;
@@ -545,8 +567,9 @@ body {
     align-items: center;
     gap: var(--space-xs);
   }
-  .forecast-card__icon {
-    font-size: 1.1rem;
+  .forecast-card__icon svg {
+    width: 18px;
+    height: 18px;
   }
   .forecast-card__condition-label {
     margin: 0;

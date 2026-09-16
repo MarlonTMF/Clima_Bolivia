@@ -1,3 +1,4 @@
+import { PinIcon, WeatherIcon, WindIcon } from "./icons/WeatherIcon";
 import type { CityForecast } from "../types";
 
 type Props = {
@@ -20,12 +21,11 @@ export function TodayHero({ forecast }: Props) {
     <section className="today-hero">
       <div className="today-hero__place">
         <p className="today-hero__caption">
-          <span aria-hidden="true">📍</span> {forecast.city.elevationM} m s. n. m. ·{" "}
-          {forecast.city.department}
+          <PinIcon size={14} /> {forecast.city.elevationM} m s. n. m. · {forecast.city.department}
         </p>
         <h2 className="today-hero__city">{forecast.city.name}</h2>
         <p className="today-hero__condition">
-          <span aria-hidden="true">{today.condition.icon}</span> {today.condition.label}
+          <WeatherIcon code={today.condition.icon} size={20} /> {today.condition.label}
         </p>
       </div>
       <div className="today-hero__reading">
@@ -33,7 +33,7 @@ export function TodayHero({ forecast }: Props) {
         <div className="today-hero__details">
           <span>Sensación {today.feelsLikeMax}°</span>
           <span className="today-hero__wind">
-            <span aria-hidden="true">💨</span> {today.windMaxKmh} km/h
+            <WindIcon size={14} /> {today.windMaxKmh} km/h
           </span>
         </div>
       </div>

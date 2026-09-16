@@ -1,4 +1,5 @@
 import { formatDate } from "../lib/formatDate";
+import { WeatherIcon, WindIcon } from "./icons/WeatherIcon";
 import type { DayForecast } from "../types";
 
 type Props = {
@@ -21,8 +22,8 @@ export function ForecastCard({ day, isToday }: Props) {
       </header>
 
       <div className="forecast-card__condition">
-        <span className="forecast-card__icon" aria-hidden="true">
-          {day.condition.icon}
+        <span className="forecast-card__icon">
+          <WeatherIcon code={day.condition.icon} size={28} />
         </span>
         <span className="forecast-card__condition-label">{day.condition.label}</span>
       </div>
@@ -43,7 +44,7 @@ export function ForecastCard({ day, isToday }: Props) {
       </p>
 
       <p className="forecast-card__wind">
-        <span aria-hidden="true">💨</span> {day.windMaxKmh} km/h
+        <WindIcon size={13} /> {day.windMaxKmh} km/h
       </p>
     </article>
   );

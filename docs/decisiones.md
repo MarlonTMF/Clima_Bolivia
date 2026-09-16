@@ -612,3 +612,67 @@ filtro genérico distingue ambos correctamente. Se reemplazó por una tabla
 explícita de 9 entradas (mismo criterio que D-04 aplica a las coordenadas:
 con datos fijos y pocos, una tabla es más simple y más correcta que una
 heurística).
+
+---
+
+## Mapa real y atribución (tercera revisión de fidelidad)
+
+El usuario rechazó la silueta ilustrativa dibujada a mano del intento
+anterior y pidió el contorno real de Bolivia delimitado por departamentos,
+con el seleccionado resaltado — como en su diseño de Stitch.
+
+**Fuente.** "Bolivia, administrative divisions - es - colored.svg",
+Wikimedia Commons, © TUBS, licencia **CC BY-SA 4.0**.
+https://commons.wikimedia.org/wiki/File:Bolivia,_administrative_divisions_-_es_-_colored.svg
+Se requiere atribución y compartir bajo licencia compatible si se modifica
+— cumplido: la atribución está aquí, en el comentario de cabecera de
+`CountryMap.tsx`, y se listará en el README.
+
+**Cómo se extrajeron los 9 departamentos, sin adivinar nada:**
+1. El archivo trae un grupo `Departments` con exactamente 9 `<path>`, cada
+   uno la forma real de un departamento — pero sin id ni nombre.
+2. Se cargó el SVG en un navegador real (Playwright) y se pidió el
+   `getBBox()` de cada path — un cálculo manual con regex sobre el
+   atributo `d` dio resultados absurdos porque no distinguía comandos de
+   path relativos de absolutos; el navegador sí los resuelve bien.
+3. El archivo también trae una capa de **etiquetas de texto con los
+   nombres reales** de 8 de los 9 departamentos (Cochabamba no tiene
+   etiqueta propia en este archivo). Se extrajo la posición x/y de cada
+   nombre real.
+4. Se emparejó cada path con su nombre real por **distancia euclidiana**
+   entre su centro (bbox) y la posición de la etiqueta — no por
+   apariencia ni por memoria geográfica. Los 8 emparejamientos son
+   inequívocos (la segunda opción más cercana queda 100-350 unidades más
+   lejos que la elegida). El noveno (Cochabamba) se dedujo por
+   eliminación y se confirmó visualmente: posición central, coherente.
+5. Verificado visualmente coloreando los 9 departamentos con colores
+   distintos y comparando contra un mapa real de Bolivia antes de
+   integrarlo — no se integró a ciegas.
+
+**Interacción.** Cada `<path>` de departamento es el elemento interactivo
+real (`role="button"`, `tabIndex`, `aria-label`, `aria-pressed`, clic y
+teclado) — no hay overlay de botones invisibles como en el intento
+anterior; ahora las formas reales ya son áreas de clic razonables.
+
+**Coste.** El bundle sube de ~72&nbsp;KB a ~98&nbsp;KB gzip por los datos del
+mapa (coordenadas redondeadas a 1 decimal: 87&nbsp;KB → 67&nbsp;KB sin
+cambio visible, verificado). Es el precio de un mapa real en vez de una
+aproximación — se acepta porque el usuario lo pidió explícitamente tras
+rechazar la alternativa ligera.
+
+## Iconos propios en vez de emoji
+
+Pedido explícito: los emoji (☀️🌦️💨📍) se leen inconsistentes entre
+sistemas operativos y poco profesionales. Se reemplazaron por SVG propios
+en `src/components/icons/WeatherIcon.tsx` — trazo simple, un solo color
+(`currentColor`, hereda del CSS), viewBox 24×24, sin librería externa
+(D-03 intacto: son componentes propios, no Material Symbols ni ningún
+paquete de iconos).
+
+`Condition.icon` cambió de un carácter emoji a una clave semántica
+tipada (`WeatherIconKey`): `"clear" | "partly-cloudy" | "cloudy" | "fog" |
+"drizzle" | "rain" | "snow" | "storm" | "unknown"`. TypeScript garantiza
+en tiempo de compilación que `weatherCodes.ts` solo puede devolver una de
+esas 9 claves — un error tipográfico en la clave ya no puede llegar a
+producción silenciosamente, como sí podía pasar con un string de emoji
+suelto.
