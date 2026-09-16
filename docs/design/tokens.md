@@ -70,7 +70,7 @@ mínima secundaria en la misma línea, menor tamaño y `--color-ink-soft` →
 sensación térmica en una fila secundaria, más pequeña → viento con icono, al
 pie. La tarjeta activa/seleccionada lleva borde de 2px en `--color-accent`.
 
-## Móvil (5 pantallas generadas aparte)
+## Móvil (5 pantallas generadas aparte, set completo y verificado)
 
 Confirmado en `stitch_Mobile/`: el **selector desplegable** resuelve la
 simplificación de la grilla de 9 ciudades que se dejaba pendiente — chevron,
@@ -84,9 +84,9 @@ ciudad activa con altitud, compacto. Se adopta como referencia directa.
   app es una sola pantalla, no cuatro secciones.
 - El código de estación inventado ("SLLP / Estación El Alto") en el estado de
   error.
-- El archivo del estado de carga móvil llegó corrupto en la descarga (ver
-  AI_LOG E-09); no se regenera porque el criterio ya está resuelto en
-  escritorio.
+- El archivo del estado de carga móvil llegó corrupto en la primera
+  descarga (ver AI_LOG E-09); ya se corrigió y es consistente con el
+  criterio de escritorio.
 
 ## Lo que se ajusta al implementar, no del diseño generado
 

@@ -335,17 +335,20 @@ algo fuera de estas paradas se registra igual.
 - **Tipo:** verificación
 - **Herramienta:** revisión propia (comando `file`)
 - **Qué propuso la IA:** —
-- **Qué encontré o decidí yo:** `screen.png` del estado de carga móvil no es
-  una imagen: son 34 bytes de texto plano, `<FIFE Image failed to fetch>`.
+- **Qué encontré o decidí yo:** `screen.png` del estado de carga móvil no era
+  una imagen: eran 34 bytes de texto plano, `<FIFE Image failed to fetch>`.
   La descarga desde Stitch falló y guardó el mensaje de error del CDN en
   lugar del PNG.
-- **Cómo se resolvió:** No se regenera — el estado de carga ya está resuelto
-  en la versión de escritorio con el mismo criterio (armazón visible,
-  valores en skeleton), y no bloquea la implementación.
+- **Cómo se resolvió:** Se volvió a guardar la captura y se re-verificó con
+  `file`: ahora es un PNG válido de 585×1497, consistente con el criterio de
+  la versión de escritorio (armazón visible desde el primer frame, valores
+  en skeleton, sin spinner sobre pantalla vacía). Confirmado también que la
+  carpeta del pop-up de "detalle del día" (descartado en E-08) ya no está
+  presente.
 - **Por qué:** Antes de abrir cualquier archivo de un proveedor externo,
   vale la pena confirmar que es lo que dice ser. `file` sobre el archivo
-  tardó dos segundos y evitó tratar un mensaje de error como un diseño
-  válido.
+  tardó dos segundos, evitó tratar un mensaje de error como un diseño
+  válido la primera vez, y confirmó la corrección la segunda.
 - **Fuente:** —
 - **Quién tenía razón:** —
 - **¿Va al README?** No — detalle operativo menor, no aporta a los 6 puntos
