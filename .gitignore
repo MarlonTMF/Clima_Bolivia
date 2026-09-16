@@ -33,3 +33,8 @@ coverage/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Salida cruda de Stitch: se conservan solo docs/design/tokens.md y
+# docs/design/prompt-stitch.md, que son los que documentan las decisiones.
+# El code.html (Tailwind + Material Symbols) y los .png no se versionan.
+docs/design/Stich resultado/

@@ -290,3 +290,62 @@ algo fuera de estas paradas se registra igual.
 - **Quién tenía razón:** yo — la revisión detectó ambos problemas antes de
   implementar
 - **¿Va al README?** Sí — «qué parte requirió más razonamiento de tu parte»
+
+---
+
+## E-08 · La vista móvil trajo una pantalla entera fuera de alcance
+- **Fecha / bloque:** 15-09-2026 · Bloque 05 (cierre)
+- **Tipo:** descarte
+- **Herramienta:** Stitch (generación) + revisión propia
+- **Qué propuso la IA (Stitch):** Cinco pantallas móviles, sin que se le
+  pidiera. Cuatro correctas (selector desplegable, cargando, error, datos en
+  caché); la quinta es un pop-up de "detalle del día" que no estaba en
+  ningún prompt, con índice UV, probabilidad de precipitación, ráfagas de
+  viento y de nuevo humedad y presión — los dos datos que D-11 ya había
+  descartado por no existir a granularidad diaria en la API.
+- **Qué encontré o decidí yo:** El pop-up es una funcionalidad completa fuera
+  del alcance del desafío (vista expandida por día), construida sobre datos
+  que ni siquiera hemos verificado que existan. El estado de error móvil
+  repite además "comprueba tu conexión a internet" (mismo problema que en
+  desktop) y añade un código de estación inventado ("SLLP / Estación El
+  Alto") que no tenemos. El selector desplegable trae una barra de
+  navegación inferior de 4 secciones (Resumen/Capitales/Radar/Alertas) que
+  no existen en una app de una sola pantalla.
+- **Cómo se resolvió:** Se descarta el pop-up de detalle completo. Se
+  descarta la barra de navegación inferior. El texto de error y el código de
+  estación se corrigen al implementar, igual que en desktop. El selector
+  desplegable en sí (sin la barra de navegación) se adopta como referencia
+  para simplificar la grilla de 9 ciudades — resuelve algo que iba a hacer a
+  mano.
+- **Por qué:** Cuantas más pantallas se le piden a una herramienta generativa
+  sin acotar el alcance, más funcionalidad inventa para "completar" la
+  experiencia — es su forma de ser útil, pero cada pantalla nueva es
+  superficie que hay que revisar, justificar o descartar. La disciplina no
+  es "generar menos", es revisar cada pantalla contra qué pedimos realmente
+  antes de aceptar nada.
+- **Fuente:** —
+- **Quién tenía razón:** yo — el pop-up y sus datos no sobrevivieron la
+  revisión
+- **¿Va al README?** Sí — «una sugerencia que decidiste no utilizar»
+
+---
+
+## E-09 · Un archivo de captura llegó corrupto
+- **Fecha / bloque:** 15-09-2026 · Bloque 05 (cierre)
+- **Tipo:** verificación
+- **Herramienta:** revisión propia (comando `file`)
+- **Qué propuso la IA:** —
+- **Qué encontré o decidí yo:** `screen.png` del estado de carga móvil no es
+  una imagen: son 34 bytes de texto plano, `<FIFE Image failed to fetch>`.
+  La descarga desde Stitch falló y guardó el mensaje de error del CDN en
+  lugar del PNG.
+- **Cómo se resolvió:** No se regenera — el estado de carga ya está resuelto
+  en la versión de escritorio con el mismo criterio (armazón visible,
+  valores en skeleton), y no bloquea la implementación.
+- **Por qué:** Antes de abrir cualquier archivo de un proveedor externo,
+  vale la pena confirmar que es lo que dice ser. `file` sobre el archivo
+  tardó dos segundos y evitó tratar un mensaje de error como un diseño
+  válido.
+- **Fuente:** —
+- **Quién tenía razón:** —
+- **¿Va al README?** No — detalle operativo menor, no aporta a los 6 puntos

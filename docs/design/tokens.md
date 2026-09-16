@@ -70,14 +70,31 @@ mínima secundaria en la misma línea, menor tamaño y `--color-ink-soft` →
 sensación térmica en una fila secundaria, más pequeña → viento con icono, al
 pie. La tarjeta activa/seleccionada lleva borde de 2px en `--color-accent`.
 
+## Móvil (5 pantallas generadas aparte)
+
+Confirmado en `stitch_Mobile/`: el **selector desplegable** resuelve la
+simplificación de la grilla de 9 ciudades que se dejaba pendiente — chevron,
+ciudad activa con altitud, compacto. Se adopta como referencia directa.
+
+**Se descarta del set móvil:**
+- El **pop-up de "detalle del día"**: pantalla completa no pedida, con índice
+  UV, probabilidad de precipitación, ráfagas de viento y de nuevo humedad y
+  presión (ya descartadas en D-11). Fuera de alcance — ver AI_LOG E-08.
+- La **barra de navegación inferior** (Resumen/Capitales/Radar/Alertas): esta
+  app es una sola pantalla, no cuatro secciones.
+- El código de estación inventado ("SLLP / Estación El Alto") en el estado de
+  error.
+- El archivo del estado de carga móvil llegó corrupto en la descarga (ver
+  AI_LOG E-09); no se regenera porque el criterio ya está resuelto en
+  escritorio.
+
 ## Lo que se ajusta al implementar, no del diseño generado
 
-1. **Selector de 9 ciudades**: la grilla 3×3 de tarjetas se simplifica a algo
-   más compacto (chips o lista). Se decide en el bloque 06/09 al ver cómo
-   queda con datos reales.
+1. **Selector de 9 ciudades** → desplegable, según la referencia móvil de
+   arriba. Ya no es una decisión pendiente.
 2. **Texto de error**: no asumir problema de conexión del usuario — el fallo
-   real más probable es el proveedor (Open-Meteo o el proxio D-09), no la red
-   del visitante.
+   real más probable es el proveedor (Open-Meteo o el proxy D-09), no la red
+   del visitante. Ni inventar códigos de estación meteorológica.
 3. **Avisos de "datos antiguos"**: el diseño ofrece tres (banner, badge,
    nota de pie); la implementación usa uno o dos, no los tres.
 4. **Ilustración de Bolivia**: se conserva como zona interactiva (aclarado
