@@ -70,7 +70,7 @@ export default function App() {
 
       <footer className="site-footer">
         <span>Datos: Open-Meteo</span>
-        <span>Actualización cada 30 minutos</span>
+        <span>Se actualiza al abrir la página</span>
       </footer>
     </>
   );

@@ -3,35 +3,38 @@
 ## D-01 · API de clima: Open-Meteo
 
 **Contexto.** Necesito pronóstico diario a 7 días con temperatura máxima,
-mínima y condición climática para 9 coordenadas fijas. Las llamadas salen de
-una función serverless propia (ver D-09), no del navegador, con caché de 30
-minutos — unos 48 refrescos al día como máximo.
+mínima y condición climática para 9 coordenadas fijas. Las llamadas salen
+directo del navegador, sin backend propio (se consideró un proxy con caché
+en D-09 y finalmente no se implementó): una sola petición a Open-Meteo con
+las 9 coordenadas, disparada cada vez que alguien abre o recarga la página.
 
 **Alternativas consideradas.** OpenWeather (One Call 3.0), WeatherAPI.com y
 Meteosource, comparadas contra documentación oficial.
 
 **Decisión.** Open-Meteo.
 
-**Razón.** Con el backend en medio, la exposición de la clave y el CORS dejan de
-discriminar, así que la decisión se apoya en tres hechos medibles:
+**Razón.** Sin backend, las llamadas salen directo del navegador: Open-Meteo no
+pide clave (nada que exponer) y responde con las cabeceras CORS necesarias
+para eso, verificado en producción. La decisión se apoya en tres hechos
+medibles:
 
 1. **Cobertura del requisito.** WeatherAPI ofrece solo 3 días de pronóstico
    diario en su plan gratuito; el desafío pide 7. Queda descartada por no
    cumplir el requisito, no por preferencia.
 2. **Holgura de cuota.** Open-Meteo resuelve las 9 ciudades en una sola
-   petición: 48 llamadas diarias sobre un límite de 10 000. OpenWeather exige
-   una petición por ciudad — 432 diarias sobre 1 000, el 43 % de la cuota.
-   Meteosource, con el mismo patrón, necesitaría 432 sobre un límite de 400:
-   **lo excede**.
+   petición por carga de página, sobre un límite de 10 000 diarias — muchísimo
+   margen incluso sin caché. OpenWeather exige una petición por ciudad, 9 por
+   carga, sobre un límite de 1 000 diarias. Meteosource, con el mismo patrón,
+   sobre un límite de 400: se agota mucho antes.
 3. **Superficie operativa.** Sin clave, sin cuenta que mantener y sin secreto
-   que rotar. Una petición dentro del proxy en lugar de nueve significa menos
-   puntos de fallo parcial que manejar.
+   que rotar. Una petición por carga en lugar de nueve significa menos puntos
+   de fallo parcial que manejar, y sin necesidad de backend alguno.
 
 **Consecuencia.** La API devuelve códigos WMO numéricos en lugar de
 descripciones, así que la traducción al español la mantengo yo (ver D-07). Y
 una limitación real: **el uso gratuito es no comercial, bajo licencia CC-BY
 4.0**. Para un uso comercial haría falta su plan de pago, o reevaluar
-OpenWeather con proxy — que ya tengo montado.
+OpenWeather (que sí exigiría backend propio para no exponer la clave).
 
 **Umbrales que cambiarían la decisión.** Superar las 10 000 llamadas diarias, o
 que el proyecto pase a uso comercial.
@@ -61,9 +64,11 @@ que un desajuste asignaría a cada ciudad el pronóstico de otra sin fallar.
 ## D-02 · Stack: React + Vite + TypeScript
 
 **Contexto.** Una sola vista, sin rutas, sin autenticación, sin estado compartido
-y sin escrituras de usuario. El frontend es estático y se sirve desde CDN; los
-datos llegan de una función serverless propia (D-09). Lo construye una persona
-en menos de diez horas y tiene que poder explicar cada línea.
+y sin escrituras de usuario. El frontend es estático y se sirve desde CDN; en
+el momento de esta decisión se evaluaba si los datos llegarían de una función
+serverless propia (ver D-09 — al final no se construyó, el cliente llama a
+Open-Meteo directo). Lo construye una persona en menos de diez horas y tiene
+que poder explicar cada línea.
 
 **Alternativas consideradas.** Vanilla JS sin build, Vue 3 + Vite, Svelte,
 Astro, Next.js y Angular.
@@ -71,14 +76,16 @@ Astro, Next.js y Angular.
 **Decisión.** React 19 + Vite + TypeScript.
 
 **Razón.** Lo primero que hay que decir es que **cinco de los criterios clásicos
-no discriminan a esta escala**:
+no discriminan a esta escala** (evaluados cuando todavía se consideraba añadir
+la función serverless de D-09; la conclusión de "indiferente entre los siete"
+se sostiene igual ahora que no se construyó):
 
 | Criterio | Por qué es indiferente |
 |---|---|
-| Añadir la función serverless | El directorio `api/` de Vercel es agnóstico del framework — su documentación incluye una variante explícita `framework=other`. Coste idéntico en los siete. |
-| Rendimiento percibido | La red hacia el proxy domina el presupuesto. La diferencia entre 2 KB y 90 KB de runtime son decenas de milisegundos sobre unos ~500 ms, y menos aún con caché de CDN. |
+| Añadir una función serverless (de haberse construido) | El directorio `api/` de Vercel es agnóstico del framework — su documentación incluye una variante explícita `framework=other`. Coste idéntico en los siete. |
+| Rendimiento percibido | La red hacia Open-Meteo domina el presupuesto, con o sin proxy en medio. La diferencia entre 2 KB y 90 KB de runtime son decenas de milisegundos sobre unos ~500 ms. |
 | Escalabilidad de carga | Frontend estático servido por CDN. Idéntico en todos. |
-| Seguridad | Ninguno expone secretos: si hubiera clave, viviría en la función. |
+| Seguridad | Ninguno expone secretos: Open-Meteo no pide clave. |
 | Coste | Los siete caben en el plan gratuito de la plataforma. |
 
 Lo que sí decide son tres cosas, y por ellas quedan fuera cuatro candidatos:
@@ -216,10 +223,11 @@ Ningún componente ve jamás un nombre de la API.
 **Razón.** Aísla el proveedor en un solo archivo. Es la decisión más barata de
 tomar y la que más se paga después.
 
-**Consecuencia — ya cobrada dos veces.** Cuando el cliente pase a llamar al
-proxy en lugar de a Open-Meteo (D-09), cambia **una constante** y ni los
-componentes ni las pruebas se enteran. Y si mañana hubiera que cambiar de
-proveedor de clima, se toca un archivo.
+**Consecuencia — ya cobrada dos veces.** Si algún día hiciera falta anteponer
+un proxy (D-09, finalmente no construido) o cambiar de proveedor de clima,
+cambia **una constante o un archivo** y ni los componentes ni las pruebas se
+enteran — el aislamiento se paga una vez y protege ambos escenarios por
+igual, se hayan materializado o no.
 
 ---
 
@@ -260,7 +268,9 @@ marcado que no podría explicar clase por clase.
 cambio cada línea del proyecto es defendible.
 
 **Resultado (15-09-2026).** Se generaron 4 pantallas: principal, cargando,
-error y datos antiguos (esta última existe por D-09). Una vuelta de
+error y datos antiguos (esta última pensada para el proxy con caché de D-09,
+que al final no se construyó — queda como referencia sin implementar). Una
+vuelta de
 corrección quitó del diseño generado lo que Stitch había añadido sin que se
 pidiera — gráfico de barras, pestaña comparativa, icono de usuario, branding
 de "red oficial" y "norma OMM", humedad y presión (ver D-11) — y añadió
@@ -321,6 +331,41 @@ vercel.com/docs/functions/configuring-functions/region.
 la revalidación **falla** — eso es `stale-if-error`, que no todos los CDN
 implementan. Se comprueba apuntando el proxy a un host inválido (caso M-11 de
 `docs/pruebas.md`). Hasta entonces, la garantía real es el `localStorage`.
+
+**Decisión final (16-09-2026): NO se implementa.** Todo lo anterior fue un
+diseño completo, nunca llegó a escribirse en código — el cliente sigue
+llamando a Open-Meteo directamente, como desde el bloque 07. Se reconsideró
+la decisión al preguntarse en voz alta si de verdad hacía falta, con la app
+ya funcionando y verificada de punta a punta.
+
+**Por qué se revierte otra vez.** Tres razones, no una sola:
+
+1. **La app ya funciona, verificado con Playwright en vivo**, no como
+   promesa. Open-Meteo es una API madura y ampliamente usada; una caída
+   exacta durante la ventana corta de revisión de un evaluador es un riesgo
+   real pero de baja probabilidad.
+2. **El enunciado penaliza explícitamente la sobre-ingeniería** —
+   "no buscamos una solución sobre-ingenierizada". Blindar contra un caso
+   raro añadiendo una capa entera de arquitectura, cuando la llamada
+   directa ya funciona, es discutiblemente justo eso.
+3. **Más superficie es más riesgo nuevo, no solo protección.** Un proxy mal
+   configurado falla de formas que la llamada directa no tiene —
+   arranques en frío, timeouts de función, o cachear un error por
+   accidente (riesgo que el propio diseño de arriba ya señalaba).
+
+**El argumento que no cambia con esta reversión.** La resiliencia ante una
+caída del proveedor sigue siendo un problema real si esto fuera producción
+con usuarios de verdad — la respuesta para esa pregunta en la entrevista es
+exactamente el diseño documentado arriba, sin construirlo. Saber cuándo
+*no* construir algo es la otra mitad del criterio que D-01→D-09 viene
+demostrando, no una excepción a él.
+
+**Historial de esta decisión, completo:** no backend (bloque 03) → sí
+backend, revertido con evidencia sobre disponibilidad de Open-Meteo (mismo
+bloque 03) → diseño completo del proxy (arriba) → **no se implementa**
+(bloque 14, revertido de nuevo). Tres vueltas sobre la misma pregunta, cada
+una con una razón distinta y verificable. Es más defendible que haber
+acertado a la primera sin revisar nunca.
 
 ---
 
@@ -383,8 +428,8 @@ solo la prueba que falla al ejecutarse.
 ```
 Datos        src/data/cities.ts       las 9 capitales, orden significativo
    ↓
-API          api/forecast.ts          proxy con caché (servidor)
-             src/lib/weatherApi.ts    fetch, validación y mapeo (cliente)
+API          src/lib/weatherApi.ts    fetch directo a Open-Meteo, validación
+                                       y mapeo (cliente) — sin proxy, ver D-09
    ↓
 Presentación src/components/*.tsx     nunca ven la forma cruda de la API
 ```
@@ -392,8 +437,6 @@ Presentación src/components/*.tsx     nunca ven la forma cruda de la API
 ## Árbol de archivos
 
 ```
-api/
-└── forecast.ts            proxy con caché ante Open-Meteo
 src/
 ├── data/cities.ts         9 ciudades — fuente única de verdad del orden
 ├── lib/
@@ -495,9 +538,10 @@ diseño.
 
 **URL de producción:** https://clima-bolivia-theta.vercel.app/
 
-**Desplegado el.** 16-09-2026, bloque 09. Plataforma Vercel, plan Hobby
-(ver D-09 sobre por qué no hace falta pagar). Framework detectado
-automáticamente (Vite), sin variables de entorno.
+**Desplegado el.** 16-09-2026, bloque 09. Plataforma Vercel, plan Hobby —
+sin función serverless que desplegar (D-09, no implementada), el sitio es
+estático y no hace falta pagar por eso ni por ninguna otra razón. Framework
+detectado automáticamente (Vite), sin variables de entorno.
 
 **Verificado tras el despliegue** (Playwright headless, no solo mirar la
 pantalla): 9 ciudades, 7 días cada una, sin errores de consola, sin scroll
@@ -507,10 +551,11 @@ horaria) — en escritorio y en viewport móvil.
 **Dato curioso, sin sobre-interpretar.** La cabecera `X-Vercel-Id` de la
 respuesta muestra `gru1` (São Paulo): el CDN de Vercel ya sirve el HTML
 estático desde el borde más cercano a Sudamérica por defecto, sin que se
-haya configurado nada. Esto es distinto de la región de la *función*
-serverless (D-09), que se fija explícitamente en `vercel.json` y solo
-importa cuando exista `api/forecast.ts` (bloque 14) — no confundir las dos
-cosas.
+haya configurado nada. De haberse construido la función serverless de D-09,
+su región se habría fijado aparte, explícitamente, en `vercel.json` — no es
+lo mismo que la región del CDN estático. Como D-09 no se implementó, este
+distingo queda como nota para el caso hipotético, no como configuración real
+del proyecto.
 
 ---
 
@@ -568,11 +613,14 @@ comparar de nuevo contra `PantallaPrincipal/screen.png` y
    `max-width` del contenedor no basta si los hijos no pueden encogerse
    (`min-width:0` + `text-overflow:ellipsis` en el select).
 
-**Aspiracional, a validar en el bloque 14:** el pie dice "Actualización
-cada 30 minutos", que es la ventana de caché planeada para el proxy de
-D-09. Hoy el cliente carga una sola vez al montar; el texto describe la
-arquitectura completa, que todavía no existe. Revisar que siga siendo
-cierto cuando el proxy se implemente.
+**Resuelto (16-09-2026).** El pie decía "Actualización cada 30 minutos",
+que era la ventana de caché planeada para el proxy de D-09 — aspiracional
+en su momento, a validar cuando el proxy se implementara. Como D-09 se
+decidió finalmente **no** implementar, ese texto quedó describiendo una
+arquitectura que nunca va a existir, es decir, una afirmación falsa en la
+interfaz. Se cambió a "Se actualiza al abrir la página", que es exactamente
+lo que el cliente hace hoy (una sola carga al montar, sin caché de ningún
+tipo).
 
 ---
 

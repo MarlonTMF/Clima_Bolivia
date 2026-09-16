@@ -472,3 +472,51 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** —
 - **Quién tenía razón:** —
 - **¿Va al README?** Sí — «cómo validas los resultados»
+
+---
+
+## E-14 · El proxy con caché de D-09 se diseña por completo y no se construye
+- **Fecha / bloque:** 16-09-2026 · Bloque 13→14
+- **Tipo:** divergencia / criterio propio del usuario
+- **Herramienta:** discusión de costo-beneficio, sin herramienta externa
+- **Qué propuso la IA:** En el bloque 03, tras la primera reversión de D-09
+  (de "no backend" a "sí backend" por el argumento de resiliencia ante una
+  caída de Open-Meteo), diseñé por completo una función serverless de proxy
+  con caché (`api/forecast.ts`, `Cache-Control: s-maxage=1800,
+  stale-while-revalidate`, fallback a `localStorage`) y la traté como
+  pendiente de construir en el bloque 14.
+- **Qué encontré o decidí yo:** El usuario preguntó directamente: "¿es
+  realmente necesario el proxy con caché? yo veo que ya todo funciona".
+  No era una corrección de un error mío, sino un cuestionamiento legítimo
+  de una decisión ya tomada, con la app ya desplegada y verificada de punta
+  a punta. Reconsideré sin defender la decisión anterior por inercia:
+  (1) la app ya funciona, verificado con Playwright en vivo, no como
+  promesa; (2) el enunciado del desafío penaliza explícitamente la
+  sobre-ingeniería; (3) más superficie (una función serverless nueva) es
+  más riesgo nuevo, no solo protección — puede fallar de formas que la
+  llamada directa no tiene. Recomendé no implementarlo.
+- **Cómo se resolvió:** El usuario confirmó: "sí, confirmo el salto". Se
+  documentó la reversión final en D-09 (`docs/decisiones.md`) con las tres
+  razones y el historial completo de las tres vueltas sobre la misma
+  pregunta, y se corrigieron todas las referencias cruzadas del documento
+  que todavía asumían que el proxy existía o se iba a construir (D-01, D-02,
+  el árbol de arquitectura, la nota de despliegue). También se corrigió el
+  pie de la interfaz real (`src/App.tsx`), que decía "Actualización cada 30
+  minutos" — una afirmación que describía la ventana de caché del proxy y
+  que, sin el proxy, era simplemente falsa. Se cambió a "Se actualiza al
+  abrir la página", que es lo que el cliente hace hoy.
+- **Por qué:** El argumento de resiliencia seguía siendo válido en
+  abstracto — si esto fuera producción con usuarios reales, sería una
+  respuesta razonable. Pero "válido en teoría" no es lo mismo que
+  "necesario para este entregable": el criterio decisivo fue que la
+  evaluación pide explícitamente evitar sobre-ingeniería y que el sistema
+  ya demostrado funcionando pesa más que un riesgo de baja probabilidad
+  durante una ventana corta de revisión.
+- **Fuente:** —
+- **Quién tenía razón:** El usuario — cuestionar una decisión ya tomada,
+  incluso una bien razonada, cuando el contexto cambió (la app ya
+  funcionando y verificada) es exactamente el tipo de revisión que evita
+  construir algo solo porque ya se había decidido construirlo.
+- **¿Va al README?** Sí — es el ejemplo más claro de «una sugerencia de la
+  IA que rechazaste o corregiste», con la particularidad de que fue una
+  decisión de la propia IA revertida dos veces sobre el mismo punto.
