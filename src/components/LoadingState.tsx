@@ -40,7 +40,7 @@ export function LoadingState() {
         </span>
       </div>
 
-      <div className="forecast-grid skeleton__grid">
+      <div className="forecast-grid">
         {Array.from({ length: 7 }, (_, i) => (
           <article key={i} className="forecast-card skeleton__card">
             <span className="skeleton__bar skeleton__bar--sm" />

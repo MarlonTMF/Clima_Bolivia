@@ -10,7 +10,9 @@
     "test:watch": "vitest",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "audit": "node scripts/audit.mjs",
+    "check": "npm run typecheck && npm run test -- --run && npm run build && npm run lint && npm run audit"
   },
   "dependencies": {
     "react": "^19.2.8",

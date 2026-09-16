@@ -698,3 +698,58 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** —
 - **Quién tenía razón:** —
 - **¿Va al README?** Sí — «cómo validas los resultados».
+
+---
+
+## E-19 · Por qué se acumularon los errores: todos eran del mismo tipo
+- **Fecha / bloque:** 16-09-2026 · Bloque 16 (revisión pedida)
+- **Tipo:** análisis de causa raíz / corrección de proceso
+- **Herramienta:** revisión de las entradas anteriores de esta bitácora
+- **Qué preguntó el usuario:** por qué se cometieron tantos errores como el
+  de Testing Library, y que se corrigiera lo que llevaba a ellos.
+- **Qué encontré al revisarlos juntos:** no eran errores variados, eran
+  **ocho instancias del mismo error**. Todos tienen la forma: *código
+  válido que no produce ningún error y simplemente no hace nada*. Una clase
+  CSS que no existe, un `outline` sobre `opacity: 0`, un `flex-direction`
+  sobre un grid, un `border-style` anulado por orden de cascada, Testing
+  Library sin desmontar, `tsc --noEmit` sin `-b`, `defineConfig` del
+  paquete equivocado, un `<title>` sin cambiar. En ninguno hay traza, aviso
+  ni código de salida distinto de cero.
+- **La causa común:** **verificaba el artefacto, no el efecto.** Leía la
+  regla CSS en vez de mirar el píxel; ejecutaba el comando en vez de
+  comprobar qué había hecho; daba por buena una suite en verde sin
+  preguntarme si sabría ponerse en rojo. `tsc` y `oxlint` refuerzan la
+  confusión, porque comprueban sintaxis y tipos —no efecto— y salir con
+  éxito se siente como una garantía que no dan.
+- **La causa secundaria:** verificaba sólo el camino feliz. Y no por
+  descuido: mis comprobaciones con Playwright esperaban `.forecast-card`,
+  o sea **esperaban a que el esqueleto desapareciera**. Estaban construidas
+  para saltarse exactamente lo que faltaba por hacer.
+- **Cómo se resolvió:** se añadió `scripts/audit.mjs` (`npm run audit`,
+  incluido en `npm run check`), que comprueba las seis categorías de fallo
+  silencioso que se dieron aquí. **Se verificó que detecta los errores
+  reales reintroduciéndolos uno a uno** y comprobando que la auditoría los
+  encuentra — no se dio por buena por estar escrita. Y se escribió en
+  `CLAUDE.md` la tabla de los ocho casos con las cinco reglas que se siguen
+  de ellos.
+- **Lo que encontró la auditoría nada más existir:** una clase
+  (`skeleton__grid`) que yo había puesto en el JSX ese mismo día sin
+  definirle ningún estilo.
+- **Y una comprobación de scroll horizontal en los cuatro estados encontró
+  otro**: el esqueleto móvil desbordaba 3 px a 375 px, por *el mismo error
+  de flex sobre grid que acababa de cometer y documentar una hora antes*.
+  Es la mejor prueba de que la disciplina personal no basta y hacía falta
+  algo automático.
+- **Por qué:** un error que se repite no se arregla corrigiendo la
+  instancia. Las dos veces que escribí `flex-direction` sobre un grid lo
+  hice sabiendo la diferencia: el problema no era ignorancia, era que nada
+  me lo decía. **Una salvaguarda automática no necesita que yo esté
+  atento**, y ese es justamente el recurso que falla cuando el proyecto se
+  alarga.
+- **Fuente:** las entradas E-06, E-12, E-13, E-16, E-17 y E-18 de esta
+  misma bitácora, más los hallazgos de la revisión delegada.
+- **Quién tenía razón:** el usuario al preguntar por el patrón en vez de
+  por el caso: la pregunta correcta no era «arregla esto» sino «por qué
+  pasa esto».
+- **¿Va al README?** Sí — es la respuesta más completa a «cómo validas los
+  resultados» y a «qué requirió más razonamiento de tu parte».

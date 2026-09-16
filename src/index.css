@@ -151,6 +151,7 @@ body {
 .skeleton__block,
 .skeleton__circle {
   display: block;
+  max-width: 100%;
   background: var(--color-accent-soft);
   border-radius: var(--radius);
   animation: skeleton-pulse 1.4s ease-in-out infinite;
@@ -862,19 +863,42 @@ body {
    daría un salto justo al llegar los datos, que es lo que un esqueleto
    existe para evitar. */
 @media (max-width: 700px) {
+  /* Segunda vez con el mismo fallo, ahora anotado: a este ancho
+     .forecast-card es GRID de 3 columnas, así que `flex-direction` no hace
+     nada y los hijos sobrantes se descolocan. La barra de ancho fijo se
+     salía 3px del viewport — lo detectó la comprobación de scroll
+     horizontal, no la vista. */
   .skeleton__card {
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-md);
+    grid-template-columns: auto 1fr auto;
+    row-gap: 0;
+    column-gap: var(--space-md);
   }
   .skeleton__card .skeleton__circle {
     width: 1.75rem;
     height: 1.75rem;
-    flex: none;
+    grid-column: 1;
+    grid-row: 1 / span 2;
   }
-  .skeleton__card .skeleton__bar--sm { width: 4.5rem; }
-  .skeleton__card .skeleton__bar--md { width: 3.5rem; }
-  .skeleton__temps { margin-left: auto; }
+  .skeleton__card .skeleton__bar--sm:first-of-type {
+    grid-column: 2;
+    grid-row: 1;
+    width: 4.5rem;
+  }
+  .skeleton__card .skeleton__bar--md {
+    grid-column: 2;
+    grid-row: 2;
+    width: 3.5rem;
+  }
+  .skeleton__temps {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  /* La sensación no se repite en la fila compacta, igual que en las
+     tarjetas reales (.forecast-card__feels). */
+  .skeleton__card > .skeleton__bar--sm:last-child {
+    display: none;
+  }
   .skeleton__bar--title { width: 8rem; height: 1.5rem; }
   .skeleton__block { width: 5.5rem; height: 2.4rem; }
 
