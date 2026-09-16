@@ -7,10 +7,10 @@ type Props = {
 };
 
 /**
- * Composición fijada en docs/design/tokens.md: fecha (+ badge HOY) →
- * condición → máxima dominante / mínima secundaria en la misma línea →
- * sensación térmica → viento. La máxima y la mínima se distinguen por
- * tamaño y color, no solo por la etiqueta — deben leerse de un vistazo.
+ * Composición fiel a la referencia de Stitch (PantallaPrincipal): fecha +
+ * badge HOY → icono grande y condición → MÁX/MÍN con etiqueta → sensación
+ * → viento. Las etiquetas "MÁX"/"MÍN" son parte del diseño, no un extra —
+ * se habían omitido en la primera implementación.
  */
 export function ForecastCard({ day, isToday }: Props) {
   return (
@@ -20,13 +20,22 @@ export function ForecastCard({ day, isToday }: Props) {
         {isToday && <span className="forecast-card__badge">HOY</span>}
       </header>
 
-      <p className="forecast-card__condition">
-        <span aria-hidden="true">{day.condition.icon}</span> {day.condition.label}
-      </p>
+      <div className="forecast-card__condition">
+        <span className="forecast-card__icon" aria-hidden="true">
+          {day.condition.icon}
+        </span>
+        <span className="forecast-card__condition-label">{day.condition.label}</span>
+      </div>
 
       <p className="forecast-card__temps">
-        <span className="forecast-card__max">{day.maxTemp}°</span>
-        <span className="forecast-card__min">{day.minTemp}°</span>
+        <span className="forecast-card__temp-group">
+          <span className="forecast-card__temp-label">MÁX</span>
+          <span className="forecast-card__max">{day.maxTemp}°</span>
+        </span>
+        <span className="forecast-card__temp-group">
+          <span className="forecast-card__temp-label">MÍN</span>
+          <span className="forecast-card__min">{day.minTemp}°</span>
+        </span>
       </p>
 
       <p className="forecast-card__feels">

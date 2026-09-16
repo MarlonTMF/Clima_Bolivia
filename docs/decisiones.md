@@ -536,3 +536,40 @@ El badge "HOY" (texto blanco, ~11px) usa un tono un 15% más oscuro,
 `--color-accent-text: #0270A9` (5.39:1), solo para ese caso. El resto de
 la interfaz conserva el acento original de `tokens.md` sin modificar. El
 texto secundario (`#64748B`) ya daba 4.76:1 sin necesidad de ajuste.
+
+---
+
+## Corrección de fidelidad al diseño (bloque 12, segunda vuelta)
+
+La primera pasada aplicó los tokens (color, tipografía, espaciado) pero no
+la **composición** real de la referencia de Stitch. Reconstruido tras
+comparar de nuevo contra `PantallaPrincipal/screen.png` y
+`stitch_Mobile/.../selector_desplegable/screen.png`:
+
+- **`TodayHero.tsx`**, nuevo: el panel "hoy" que faltaba por completo —
+  ciudad grande, altitud/departamento, condición, número grande.
+  **Diferencia honesta:** el diseño original mostraba una lectura
+  instantánea ("11.4°"); no tenemos temperatura actual, solo pronóstico
+  diario (D-01). El número grande es la **máxima de hoy**, dato real.
+- Tarjetas: se añadieron las etiquetas **MÁX/MÍN** que se habían omitido,
+  y el icono pasa a estar centrado y grande, como en la referencia.
+- Encabezado y pie: replican la franja de marca ("BOLIVIA CLIMA" + etiqueta
+  + hora) y el pie ("Datos: Open-Meteo" · frecuencia de actualización).
+- Móvil: la fila de 7 días se simplifica a fecha + condición + máx/mín en
+  una línea, **sin sensación ni viento repetidos** — esos datos solo
+  aparecen una vez, en el panel "hoy". No es una simplificación mía: es la
+  densidad de información que el propio diseño de Stitch eligió para esa
+  vista.
+
+**Dos bugs reales encontrados verificando a 375px, no asumidos:**
+1. `.city-selector__control` tenía `max-width: 26rem` (416px), más ancho
+   que el propio viewport de 375px.
+2. Aun corrigiendo eso, el `<select>` seguía desbordando: fijar el
+   `max-width` del contenedor no basta si los hijos no pueden encogerse
+   (`min-width:0` + `text-overflow:ellipsis` en el select).
+
+**Aspiracional, a validar en el bloque 14:** el pie dice "Actualización
+cada 30 minutos", que es la ventana de caché planeada para el proxy de
+D-09. Hoy el cliente carga una sola vez al montar; el texto describe la
+arquitectura completa, que todavía no existe. Revisar que siga siendo
+cierto cuando el proxy se implemente.

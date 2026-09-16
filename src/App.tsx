@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { fetchForecasts } from "./lib/weatherApi";
 import { CITIES } from "./data/cities";
 import { CitySelector } from "./components/CitySelector";
+import { TodayHero } from "./components/TodayHero";
 import { ForecastGrid } from "./components/ForecastGrid";
 import { LoadingState } from "./components/LoadingState";
 import { ErrorState } from "./components/ErrorState";
@@ -21,18 +22,14 @@ export default function App() {
     fetchForecasts()
       .then((data) => setForecasts(data))
       .catch((cause: unknown) => {
-        // El detalle técnico (el que prueban weatherApi.test.ts) va a la
-        // consola para quien depure. La pantalla solo muestra un mensaje
-        // accionable — ver ErrorState.
         console.error(cause);
         setError(true);
       })
       .finally(() => setIsLoading(false));
   }, []);
 
-  // oxlint marca un aviso aquí (set-state-in-effect): es el patrón estándar
-  // de "cargar al montar". Evitarlo exigiría Suspense o una librería de
-  // datos, que contradice D-03 para un proyecto de este tamaño. Aceptado.
+  // oxlint marca un aviso aceptado (set-state-in-effect) en el patrón
+  // estándar de carga al montar — ver bloque 11 / AI_LOG para el detalle.
   useEffect(() => {
     load();
   }, [load]);
@@ -40,21 +37,38 @@ export default function App() {
   const selected = forecasts?.find((f) => f.city.id === selectedId);
 
   return (
-    <main className="app">
-      <header className="app__header">
-        <h1>Clima Bolivia</h1>
-        <p className="app__subtitle">Pronóstico de 7 días para las 9 capitales departamentales</p>
+    <>
+      <header className="site-header">
+        <div className="site-header__brand">
+          <span className="site-header__dot" aria-hidden="true" />
+          <strong>BOLIVIA CLIMA</strong>
+          <span className="site-header__divider" aria-hidden="true" />
+          <span className="site-header__tag">Pronóstico meteorológico departamental</span>
+        </div>
+        <span className="site-header__meta">UTC-4 · Bolivia</span>
       </header>
 
-      {isLoading && <LoadingState />}
-      {!isLoading && error && <ErrorState onRetry={load} />}
+      <main className="app">
+        {isLoading && <LoadingState />}
+        {!isLoading && error && <ErrorState onRetry={load} />}
 
-      {!isLoading && !error && forecasts && (
-        <>
-          <CitySelector cities={CITIES} selectedId={selectedId} onSelect={setSelectedId} />
-          {selected && <ForecastGrid forecast={selected} />}
-        </>
-      )}
-    </main>
+        {!isLoading && !error && forecasts && (
+          <>
+            <CitySelector cities={CITIES} selectedId={selectedId} onSelect={setSelectedId} />
+            {selected && (
+              <>
+                <TodayHero forecast={selected} />
+                <ForecastGrid forecast={selected} />
+              </>
+            )}
+          </>
+        )}
+      </main>
+
+      <footer className="site-footer">
+        <span>Datos: Open-Meteo</span>
+        <span>Actualización cada 30 minutos</span>
+      </footer>
+    </>
   );
 }

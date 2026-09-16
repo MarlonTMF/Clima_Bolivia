@@ -1,17 +1,21 @@
 /*
- * Tokens de docs/design/tokens.md, como variables CSS (bloque 12).
- * Una desviación documentada: --color-accent-text es más oscuro que el
- * acento extraído (#0284C7 da 4.10:1 contra blanco, insuficiente para
+ * Tokens de docs/design/tokens.md, como variables CSS. Composición
+ * reconstruida (bloque 12, segunda vuelta) para seguir de cerca la
+ * referencia real de Stitch — ver PantallaPrincipal/screen.png y
+ * stitch_Mobile/*selector_desplegable/screen.png.
+ *
+ * Desviación accesible documentada: --color-accent-text es más oscuro que
+ * el acento extraído (#0284C7 da 4.10:1 contra blanco, insuficiente para
  * texto blanco pequeño con el umbral AA de 4.5:1 — verificado con la
- * fórmula de luminancia relativa de WCAG, no a ojo). #0284C7 se conserva
- * tal cual para bordes y foco, donde el umbral correcto es 3:1.
+ * fórmula de luminancia relativa de WCAG). #0284C7 se conserva tal cual
+ * para bordes y foco, donde el umbral correcto es 3:1.
  */
 :root {
   --color-accent: #0284c7;
-  --color-accent-text: #0270a9; /* accesible para texto blanco pequeño */
+  --color-accent-text: #0270a9;
   --color-accent-soft: #e0f2fe;
   --color-ink: #0f172a;
-  --color-ink-soft: #64748b; /* token original — 4.76:1 contra blanco, ya pasa AA sin ajuste */
+  --color-ink-soft: #64748b;
   --color-ground: #f8fafc;
   --color-surface: #ffffff;
   --color-line: #e2e8f0;
@@ -28,7 +32,8 @@
   --space-xl: 2.5rem;
 
   --radius: 0.375rem;
-  --radius-lg: 0.5rem;
+  --radius-lg: 0.75rem;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 10px -4px rgba(15, 23, 42, 0.08);
 
   color-scheme: light;
 }
@@ -44,28 +49,76 @@ body {
   line-height: 1.5;
 }
 
-/* Foco visible en todo elemento interactivo — requisito del bloque 12,
-   no un extra. El navegador ya lo hace razonablemente bien; se refuerza
-   el contorno para que no dependa del user-agent. */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
+/* ---------- encabezado con marca, a sangre completa ---------- */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-line);
+}
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.site-header__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex: none;
+}
+.site-header__brand strong {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+.site-header__divider {
+  width: 1px;
+  height: 1rem;
+  background: var(--color-line);
+}
+.site-header__tag {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-soft);
+}
+.site-header__meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- pie ---------- */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--color-line);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- contenido ---------- */
 .app {
   max-width: 1100px;
   margin: 0 auto;
   padding: var(--space-lg) var(--space-md);
-}
-
-.app__header h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-.app__subtitle {
-  color: var(--color-ink-soft);
-  margin: var(--space-xs) 0 0;
 }
 
 .loading-state {
@@ -98,40 +151,119 @@ body {
   color: white;
 }
 
+/* ---------- selector: tarjeta bordeada con chevron propio ---------- */
 .city-selector {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin: var(--space-lg) 0;
-  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
 }
 .city-selector__label {
-  font-size: 0.85rem;
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--color-ink-soft);
+  margin-bottom: var(--space-xs);
+}
+.city-selector__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: 0.4rem var(--space-md);
+  box-shadow: var(--shadow-card);
+  max-width: min(26rem, 100%); /* 26rem (416px) desbordaba un viewport de 375px */
 }
 .city-selector__select {
+  flex: 1;
+  min-width: 0; /* permite que el select se encoja; si no, desborda el
+                   contenedor aunque este tenga max-width (bug real
+                   encontrado al verificar a 375px) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font: inherit;
   font-size: 1rem;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
-  background: var(--color-surface);
+  font-weight: 600;
+  padding: 0.4rem 0;
+  border: none;
+  background: transparent;
   color: var(--color-ink);
+  /* select nativo, pero sin la flecha por defecto: se dibuja una propia
+     para acercarse al chevron de la referencia. */
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  padding-right: 1.5rem;
   max-width: 100%;
 }
 .city-selector__elevation {
-  color: var(--color-ink-soft);
-  font-size: 0.85rem;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: var(--color-ink-soft);
+  border-left: 1px solid var(--color-line);
+  padding-left: var(--space-md);
+  white-space: nowrap;
 }
 
-/*
- * Grilla de 7 días. Escritorio: 7 columnas iguales, todo visible sin
- * scroll (era el bug encontrado y documentado al cierre del bloque 10).
- * Bajo los 700px se apila verticalmente, siguiendo la referencia móvil de
- * Stitch (docs/design/tokens.md): una fila compacta por día.
- */
+/* ---------- panel "hoy": réplica del hero de Stitch ---------- */
+.today-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-lg);
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+.today-hero__caption {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-soft);
+}
+.today-hero__city {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+.today-hero__condition {
+  margin: var(--space-sm) 0 0;
+  font-size: 1rem;
+}
+.today-hero__reading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-lg);
+}
+.today-hero__temp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.today-hero__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+.today-hero__wind {
+  white-space: nowrap;
+}
+
+/* ---------- grilla de 7 días ---------- */
 .forecast-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -139,11 +271,13 @@ body {
 }
 
 .forecast-card {
-  min-width: 0; /* permite que las celdas de grid se encojan de verdad */
+  min-width: 0;
   border: 1px solid var(--color-line);
-  border-radius: var(--radius);
-  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-align: center;
 }
 .forecast-card--today {
   border-color: var(--color-accent);
@@ -152,84 +286,138 @@ body {
 .forecast-card__date {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-xs);
   font-size: 0.85rem;
   font-weight: 600;
   flex-wrap: wrap;
 }
 .forecast-card__badge {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   background: var(--color-accent-text);
   color: white;
   padding: 0.1rem 0.4rem;
-  border-radius: var(--radius);
-  letter-spacing: 0.02em;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
 }
+
+/* Icono grande y centrado, condición debajo — igual que la referencia. */
 .forecast-card__condition {
-  font-size: 0.85rem;
   margin: var(--space-sm) 0;
+}
+.forecast-card__icon {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.forecast-card__condition-label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-ink-soft);
+  margin-top: var(--space-xs);
   overflow-wrap: break-word;
 }
 
-/* Máxima dominante, mínima secundaria — jerarquía fijada en tokens.md.
-   font-variant-numeric evita que -12° empuje el layout de forma distinta
-   a 5°: todos los dígitos ocupan el mismo ancho. */
+/* Máxima y mínima con etiqueta MÁX/MÍN — se habían omitido en la primera
+   versión. tabular-nums para que -12° no desplace el layout. */
 .forecast-card__temps {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   display: flex;
-  align-items: baseline;
-  gap: var(--space-sm);
-  margin: var(--space-xs) 0;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-md);
+  margin: var(--space-sm) 0;
+}
+.forecast-card__temp-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+.forecast-card__temp-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-soft);
 }
 .forecast-card__max {
-  font-size: 1.375rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--color-ink);
 }
 .forecast-card__min {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
+  font-weight: 500;
   color: var(--color-ink-soft);
 }
 .forecast-card__feels,
 .forecast-card__wind {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--color-ink-soft);
   margin: 0.15rem 0;
-  overflow-wrap: break-word;
 }
 
+/*
+ * Móvil: fila compacta de una sola línea (fecha+HOY | condición | temps),
+ * SIN sensación ni viento por día — esos datos solo se muestran una vez,
+ * en el panel "hoy" (today-hero), igual que la referencia móvil de Stitch.
+ * No es una simplificación mía: es la densidad de información que el
+ * propio diseño eligió para la lista de 7 días en pantallas pequeñas.
+ */
 @media (max-width: 700px) {
+  /* Redundante con la altitud ya mostrada en el panel "hoy"; a este
+     ancho no hay sitio para repetirla sin forzar el desborde. */
+  .city-selector__elevation {
+    display: none;
+  }
+
+  .today-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .today-hero__reading {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
   .forecast-grid {
     grid-template-columns: 1fr;
   }
-  /* Fila compacta: fecha+condición a la izquierda, temperaturas a la
-     derecha, en una sola línea — igual que el selector móvil de Stitch. */
   .forecast-card {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     column-gap: var(--space-md);
-    row-gap: 0.15rem;
+    text-align: left;
+    padding: var(--space-sm) var(--space-md);
   }
   .forecast-card__date {
-    grid-column: 1;
+    justify-content: flex-start;
+    white-space: nowrap;
   }
   .forecast-card__condition {
-    grid-column: 1;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  .forecast-card__icon {
+    font-size: 1.1rem;
+  }
+  .forecast-card__condition-label {
     margin: 0;
   }
   .forecast-card__temps {
-    grid-column: 2;
-    grid-row: 1 / 3;
-    justify-self: end;
+    margin: 0;
+    gap: var(--space-sm);
+  }
+  .forecast-card__temp-label {
+    display: none; /* la referencia móvil no repite MÁX/MÍN en cada fila */
   }
   .forecast-card__feels,
   .forecast-card__wind {
-    grid-column: 1 / -1;
+    display: none;
   }
 }
