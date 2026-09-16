@@ -753,3 +753,49 @@ algo fuera de estas paradas se registra igual.
   pasa esto».
 - **¿Va al README?** Sí — es la respuesta más completa a «cómo validas los
   resultados» y a «qué requirió más razonamiento de tu parte».
+
+---
+
+## E-20 · La matriz de pruebas tenía dos casos que no probaban lo que decían
+- **Fecha / bloque:** 16-09-2026 · Bloque 17
+- **Tipo:** corrección
+- **Herramienta:** Playwright sobre producción, Chromium y Firefox
+- **Qué propuso la IA:** La matriz manual se escribió en el bloque 03, antes
+  de existir el código. Entre sus diez casos: **M-05, «desactivar red y
+  recargar, debe verse el mensaje de error»**, y **M-09, «Tab por toda la
+  interfaz, el foco debe verse»**.
+- **Qué encontré al ejecutarlos:** los dos fallaron, y en ambos el fallo era
+  del caso, no de la aplicación. **M-05 es imposible tal como está escrito**:
+  sin red no llega ni el HTML, así que lo que se ve es la pantalla de error
+  del navegador y la aplicación ni siquiera llega a ejecutarse. El caso que
+  sí prueba el manejo de errores es que la red se caiga **con la aplicación
+  ya abierta**. **M-09 comprobaba otra cosa**: pulsaba Tab dos veces y miraba
+  dónde había caído el foco, que resultó ser un departamento del mapa, no el
+  selector; el contorno que medía era el de un elemento que no estaba
+  enfocado.
+- **Y un fallo de la propia verificación:** las esperas por `.forecast-card`
+  se cumplían **con el esqueleto de carga**, porque sus tarjetas comparten
+  esa clase para heredar los estilos. Estaba midiendo el tiempo hasta que
+  aparece el esqueleto, no hasta que hay datos, y contando siete tarjetas que
+  estaban vacías. Se corrigió esperando por `.today-hero__city`, que sólo
+  existe cuando hay datos reales.
+- **Cómo se resolvió:** los dos casos se replantearon a lo que sí es
+  verificable, se documentó el cambio en `docs/pruebas.md` en lugar de
+  reescribirlos en silencio, y los doce casos se ejecutaron en dos
+  navegadores: 23 de 24 comprobaciones pasan.
+- **Por qué:** una prueba escrita antes que el código describe una intención,
+  no un procedimiento. Al ejecutarla aparece si el procedimiento existe.
+  Ninguno de los dos casos habría fallado nunca **por un defecto de la
+  aplicación**, así que habrían dado una confianza falsa indefinidamente.
+  Es la misma familia que E-19: algo que parece correcto y mide otra cosa.
+- **Lo que sí encontró la matriz:** texto a 8,8 px en la fila móvil,
+  demasiado pequeño para su propio criterio de «texto legible». Subido a
+  10,4 px y comprobado que sigue cabiendo a 375 px.
+- **Sobre el único caso que no pasó:** M-01 en Chromium dio 2 015 ms frente
+  a un umbral de 2 000. Quince milisegundos son ruido, no un fallo, y la
+  respuesta correcta no era ajustar el umbral ni declararlo aprobado sino
+  **medir cinco veces**: mediana de 1 896 ms. Una sola muestra no decide
+  nada cerca del umbral.
+- **Fuente:** —
+- **Quién tenía razón:** —
+- **¿Va al README?** Sí — «cómo validas los resultados».

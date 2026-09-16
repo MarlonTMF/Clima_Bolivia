@@ -91,22 +91,39 @@ comprobarlo. Queda anotado sin explicación en lugar de omitirlo.
 
 ## Lighthouse (producción)
 
-| Métrica | Objetivo | Obtenido |
-|---------|----------|----------|
-| Rendimiento | ≥ 90 | **100** |
-| Accesibilidad | ≥ 95 | **100** |
-| Prácticas recomendadas | ≥ 95 | **100** |
-| SEO | ≥ 90 | **90** en la primera pasada — faltaba la `meta description`. Corregida y añadido `robots.txt`; el número de la segunda medición está más abajo |
+Dos pasadas sobre la URL desplegada. La primera destapó la falta de
+`meta description`; tras corregirla y añadir un `robots.txt`, se volvió a
+medir **después de desplegar**, no en local.
 
-Métricas de carga: First Contentful Paint 1,4 s · Largest Contentful Paint
-1,4 s · Total Blocking Time 60 ms · **Cumulative Layout Shift 0**.
+| Métrica | Objetivo | 1ª pasada | 2ª pasada |
+|---------|----------|-----------|-----------|
+| Rendimiento | ≥ 90 | 100 | **99** |
+| Accesibilidad | ≥ 95 | 100 | **100** |
+| Prácticas recomendadas | ≥ 95 | 100 | **100** |
+| SEO | ≥ 90 | 90 | **100** |
+
+Los cuatro objetivos se cumplen. **El rendimiento bajó de 100 a 99 entre las
+dos pasadas sin que cambiara nada relevante**: es la variabilidad normal de
+Lighthouse, que mide una carga real sobre una red real. Se anotan las dos
+cifras en vez de quedarse con la mejor.
+
+| Métrica de carga | 1ª pasada | 2ª pasada |
+|---|---|---|
+| First Contentful Paint | 1,4 s | 1,7 s |
+| Largest Contentful Paint | 1,4 s | 1,7 s |
+| Total Blocking Time | 60 ms | 40 ms |
+| **Cumulative Layout Shift** | **0** | **0** |
 
 El CLS en cero merece una nota: es la consecuencia medible del esqueleto de
 carga. Como reserva el mismo espacio que ocupará el contenido, la página no
-da ningún salto cuando llegan los datos.
+da ningún salto cuando llegan los datos. Es la única métrica que no varió
+entre pasadas, porque no depende de la red.
 
-Las 21 auditorías de accesibilidad pasan. El único punto que restaba era la
-ausencia de `meta description`, corregida.
+Las 21 auditorías de accesibilidad pasan en ambas pasadas. Lo que impide un
+100 redondo en rendimiento son métricas de tiempo de red (FCP, LCP, Speed
+Index) y `unused-javascript`, que a esta escala no justifica dividir el
+paquete: el cuello de botella medido es la petición a la API, no el tamaño
+del bundle.
 
 ## Qué NO se prueba, y por qué
 
