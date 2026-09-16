@@ -154,7 +154,8 @@ exigiría un backend propio para no exponer la clave en el navegador.
 - **Sólo nueve ciudades, fijas en el código.** No hay buscador ni geocoding:
   el enunciado pide exactamente esas nueve y son un dato estable.
 - **Sin backend.** Se diseñó un proxy con caché y **se decidió no
-  construirlo**; el razonamiento completo está más abajo.
+  construirlo**; el razonamiento completo está en D-09 de
+  [`docs/decisiones.md`](docs/decisiones.md).
 - **No probado en un teléfono físico.** Se verificó a 375 px en navegadores
   de escritorio, que no reproduce el táctil ni la red móvil.
 - **El orden de `cities.ts` está acoplado al de la petición.** Es
