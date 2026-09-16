@@ -822,3 +822,77 @@ que el usuario experimente.
 navegador headless, desde una única ubicación. No dice nada sobre 4G, ni sobre
 un teléfono real, ni sobre otras regiones. Las métricas de Lighthouse van
 aparte, en el bloque 17.
+
+---
+
+## D-13 · Los tres estados de la interfaz, según el diseño
+
+**Contexto.** La referencia de Stitch incluye cuatro pantallas, no una: principal,
+cargando, error y datos antiguos, cada una en escritorio y en móvil. Sólo se
+había implementado la principal; los otros estados eran un párrafo de texto
+(«Cargando el pronóstico…») y un recuadro rojo. **Lo detectó el usuario
+revisando la pantalla de carga**, no una prueba ni una revisión de código.
+
+**Decisión.** Implementar los tres estados restantes siguiendo la referencia.
+
+**Lo que tenían en común los tres diseños, y que era el verdadero fallo.**
+Ninguno vacía la página: los tres conservan cabecera, selector, mapa y la
+rejilla de 7 días, y cambian sólo la zona que depende de la API. La
+implementación anterior hacía lo contrario — durante la carga y ante un error
+**desaparecía todo**, incluido el selector, que no depende de la API. Esto
+provoca un salto de layout al llegar los datos, que es justo lo que un
+esqueleto existe para evitar.
+
+**Estado cargando.** Esqueleto con la forma final del contenido: bloques
+atenuados donde irán el panel de hoy y las 7 tarjetas, con las etiquetas
+MÁX/MÍN ya visibles, distintivo «Sincronizando» y el pie «Conectando con
+servicio meteorológico…». El selector se muestra **completo, no como
+esqueleto**: sus datos son estáticos (D-04), así que puede usarse mientras
+carga. La animación respeta `prefers-reduced-motion`.
+
+**Estado error.** Panel centrado con icono, el motivo en lenguaje llano y
+«Reintentar pronóstico», más las 7 tarjetas en «Sin datos» con borde
+discontinuo y `--°`. Mostrar la rejilla vacía comunica *qué* falta, no sólo
+que algo falló. El texto técnico sigue sin llegar a la pantalla (bloque 11).
+
+**Estado datos antiguos.** Ver D-14.
+
+**Verificado.** Los seis estados (tres × escritorio y móvil) se provocaron en
+un navegador real interceptando la red: reteniendo la respuesta para la
+carga, abortándola para el error, y cargando bien antes de abortar para los
+datos antiguos. Cero errores de consola en los seis.
+
+---
+
+## D-14 · Copia local de la última respuesta (`localStorage`)
+
+**Contexto.** La pantalla «Datos antiguos» del diseño muestra la última lectura
+guardada cuando el servicio no responde. Para tener algo que mostrar hay que
+guardarlo en alguna parte, y el proxy con caché que iba a hacerlo se descartó
+en D-09.
+
+**Decisión.** Guardar la última respuesta correcta en `localStorage`, en el
+cliente.
+
+**Razón.** Del diseño de D-09 se descartó **la parte de servidor**, no esta.
+`localStorage` no necesita backend, ni despliegue, ni región, ni cabeceras de
+caché, y no tiene el riesgo que hacía peligroso al proxy: cachear un error y
+dejar la aplicación rota durante toda la ventana. Son ~60 líneas y da datos
+reales a una pantalla que ya estaba diseñada.
+
+**Consecuencia.** La aplicación tiene cuatro estados en lugar de tres:
+`loading`, `ok`, `stale` y `error`. La distinción que importa es que **un
+fallo con copia no es lo mismo que un fallo sin ella**: en el primer caso hay
+datos reales, sólo que viejos, y ocultarlos sería peor que mostrarlos
+avisando.
+
+**Detalles que evitan afirmaciones falsas.** La antigüedad se calcula de la
+marca de tiempo guardada («hace 2 horas», «hace 3 días»), no es un texto fijo;
+la hora se muestra en la zona de Bolivia. Todo acceso a `localStorage` va en
+`try/catch` porque lanza en modo privado y cuando el almacenamiento está
+lleno, y lo leído se valida antes de usarse: puede venir de una versión
+anterior de la aplicación.
+
+**Lo que esto NO es.** No es una caché que evite peticiones: cada carga sigue
+pidiendo datos frescos a Open-Meteo. Es sólo un respaldo para cuando esa
+petición falla. El pie de la interfaz sigue diciendo la verdad.

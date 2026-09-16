@@ -615,3 +615,86 @@ algo fuera de estas paradas se registra igual.
 - **Quién tenía razón:** La estructura del argumento era mía y se sostuvo;
   los números eran míos y estaban mal. Ambas cosas cuentan.
 - **¿Va al README?** Sí — «cómo validas los resultados».
+
+---
+
+## E-17 · Tres de las cuatro pantallas del diseño no se habían implementado
+- **Fecha / bloque:** 16-09-2026 · Bloque 16 (corrección pedida)
+- **Tipo:** corrección / omisión
+- **Herramienta:** revisión visual del usuario
+- **Qué propuso la IA:** Di por terminada la interfaz en el bloque 12 y la
+  verifiqué en los bloques 15 y 16 sin detectar nada. En las tres rondas de
+  fidelidad al diseño se compararon **la pantalla principal** en escritorio
+  y móvil, y ahí quedó: el estado de carga era un párrafo de texto
+  («Cargando el pronóstico…») y el de error un recuadro rojo con un botón.
+- **Qué encontró el usuario:** Revisando la pantalla de carga antes de que
+  aparezcan los datos, vio que no correspondía a ninguno de los diseños de
+  Stitch, y que faltaban tres: cargando, datos antiguos y error, **ninguno
+  de los tres en escritorio ni en móvil**. Seis pantallas diseñadas y sin
+  usar, que llevaban en `docs/design/` desde el bloque 05.
+- **Cómo se resolvió:** Se implementaron los tres estados (D-13) y la copia
+  local que da datos al tercero (D-14). Los seis se provocaron en un
+  navegador real interceptando la red —reteniendo la respuesta, abortándola,
+  y cargando bien antes de abortar— y se compararon contra las capturas
+  originales.
+- **Por qué:** El fallo de fondo no fue estético sino de método. **Verifiqué
+  siempre el camino feliz**: cada revisión cargaba la página, esperaba a que
+  los datos llegaran y comparaba con el diseño. El estado de carga dura
+  medio segundo y el de error no ocurre nunca si la API responde, así que
+  ninguna de mis verificaciones pasó por ellos — ni siquiera las de
+  Playwright, que esperaban `.forecast-card` y por tanto **esperaban a que
+  el esqueleto desapareciera**. Estaban diseñadas para saltarse justo lo que
+  no estaba hecho.
+  Y al implementarlos apareció el error que los tres diseños comparten y que
+  yo no vi al leerlos: **ninguno vacía la página**. Mi versión sí lo hacía —
+  durante la carga desaparecía hasta el selector, que ni siquiera depende de
+  la API. Eso provoca un salto de layout justo al llegar los datos, que es
+  exactamente lo que un esqueleto sirve para evitar.
+- **Dos errores propios encontrados al verificar, no al escribir:** (1) la
+  regla del borde discontinuo de las tarjetas vacías no se aplicaba, porque
+  `.forecast-card` se define después en el archivo y su `border: 1px solid`
+  ganaba por orden con la misma especificidad; (2) en móvil las tarjetas son
+  `grid` de tres columnas, no flex, así que mi `flex-direction: row` no
+  hacía nada y el cuarto hijo caía a otra línea. Las dos se vieron en la
+  captura y ninguna en el código.
+- **Fuente:** `docs/design/Stich resultado/` — seis capturas, tres estados
+  × escritorio y móvil.
+- **Quién tenía razón:** El usuario, y sobre algo que llevaba cuatro bloques
+  delante de mí.
+- **¿Va al README?** Sí — «cómo validas los resultados»: verificar sólo el
+  camino feliz deja fuera justo los estados que existen para cuando algo
+  sale mal.
+
+---
+
+## E-18 · Testing Library nunca había limpiado el DOM entre pruebas
+- **Fecha / bloque:** 16-09-2026 · Bloque 16 (corrección pedida)
+- **Tipo:** corrección
+- **Herramienta:** Vitest + Testing Library
+- **Qué propuso la IA:** Al añadir las pruebas del estado «datos antiguos»,
+  dos fallaban. Mi primera explicación fue que `localStorage` quedaba sucio
+  entre pruebas, y moví la limpieza de `afterEach` a `beforeEach`. **Siguió
+  fallando**, así que la explicación era incorrecta.
+- **Qué encontré o decidí yo:** En vez de seguir probando arreglos, aislé la
+  prueba en un archivo propio: **pasó**. Eso descartaba el contenido de la
+  prueba y señalaba a la contaminación entre pruebas del mismo archivo. La
+  causa real: Testing Library sólo registra su limpieza automática si
+  encuentra un `afterEach` **global**, y este proyecto no usa
+  `globals: true` en `vitest.config`. Nunca había desmontado nada: cada
+  `render` se quedaba en el documento y las pruebas veían el DOM de las
+  anteriores.
+- **Cómo se resolvió:** `cleanup()` explícito en `src/test-setup.ts`, con el
+  porqué escrito al lado.
+- **Por qué:** Lo importante es que **las pruebas que ya existían pasaban por
+  casualidad**. Buscaban elementos que no aparecían en los árboles
+  acumulados, así que el fallo estaba latente desde el bloque 13 sin que
+  nada lo delatara. Sólo salió cuando una prueba nueva buscó un elemento que
+  otra prueba también renderizaba.
+  El segundo aprendizaje es de método: hice un cambio basado en una
+  hipótesis no comprobada y no funcionó. Aislar el caso costó dos minutos y
+  dio la respuesta exacta. **Cuando un arreglo no funciona, la siguiente
+  acción no es otro arreglo, es un experimento que distinga entre las
+  hipótesis.**
+- **Fuente:** —
+- **Quién tenía razón:** —
+- **¿Va al README?** Sí — «cómo validas los resultados».

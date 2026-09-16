@@ -1,8 +1,10 @@
-import { PinIcon, WeatherIcon, WindIcon } from "./icons/WeatherIcon";
+import { HistoryIcon, PinIcon, WeatherIcon, WindIcon } from "./icons/WeatherIcon";
 import type { CityForecast } from "../types";
 
 type Props = {
   forecast: CityForecast;
+  /** Los datos vienen de la copia local, no de una carga reciente. */
+  isStale?: boolean;
 };
 
 /**
@@ -14,7 +16,7 @@ type Props = {
  * grande, condición, número grande + sensación + viento a la derecha) sí
  * sigue la referencia.
  */
-export function TodayHero({ forecast }: Props) {
+export function TodayHero({ forecast, isStale = false }: Props) {
   const today = forecast.days[0];
 
   return (
@@ -23,7 +25,14 @@ export function TodayHero({ forecast }: Props) {
         <p className="today-hero__caption">
           <PinIcon size={14} /> {forecast.city.elevationM} m s. n. m. · {forecast.city.department}
         </p>
-        <h2 className="today-hero__city">{forecast.city.name}</h2>
+        <h2 className="today-hero__city">
+          {forecast.city.name}
+          {isStale && (
+            <span className="today-hero__stale">
+              <HistoryIcon size={13} /> Última lectura guardada
+            </span>
+          )}
+        </h2>
         <p className="today-hero__condition">
           <WeatherIcon code={today.condition.icon} size={20} /> {today.condition.label}
         </p>

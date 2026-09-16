@@ -132,3 +132,65 @@ export function WindIcon({ size = 16 }: { size?: number }) {
     </svg>
   );
 }
+
+/** Nube tachada: sin conexión con el servicio. Estados de error y "sin datos". */
+export function CloudOffIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8.2 6.1A5.2 5.2 0 0 1 17.5 9h.3a3.7 3.7 0 0 1 2.6 6.3" />
+      <path d="M15.5 18H6.8A3.8 3.8 0 0 1 6 10.5" />
+      <path d="M3 3l18 18" />
+    </svg>
+  );
+}
+
+/** Reloj con flecha hacia atrás: lectura guardada de antes. */
+export function HistoryIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3.2 10.5a9 9 0 1 1 .8 5" />
+      <path d="M3 20v-5h5" />
+      <path d="M12 7.5V12l3 1.8" />
+    </svg>
+  );
+}
+
+/** Flecha circular: reintentar. */
+export function RefreshIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1" />
+      <path d="M20.8 4.2V9h-4.8" />
+    </svg>
+  );
+}

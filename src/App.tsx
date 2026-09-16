@@ -1,32 +1,52 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchForecasts } from "./lib/weatherApi";
+import { saveForecasts, readForecasts } from "./lib/forecastCache";
 import { CITIES } from "./data/cities";
 import { CitySelector } from "./components/CitySelector";
 import { TodayHero } from "./components/TodayHero";
 import { ForecastGrid } from "./components/ForecastGrid";
 import { LoadingState } from "./components/LoadingState";
 import { ErrorState } from "./components/ErrorState";
+import { StaleBanner } from "./components/StaleBanner";
 import { WeatherIcon } from "./components/icons/WeatherIcon";
 import type { CityForecast } from "./types";
 
+/**
+ * Cuatro estados, no tres. "stale" existe porque una carga fallida con copia
+ * guardada no es lo mismo que una carga fallida sin nada que mostrar: en el
+ * primer caso hay datos reales, sólo que viejos, y ocultarlos sería peor que
+ * enseñarlos con su aviso.
+ */
+type Status = "loading" | "ok" | "stale" | "error";
+
 export default function App() {
   const [forecasts, setForecasts] = useState<CityForecast[] | null>(null);
-  const [error, setError] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [status, setStatus] = useState<Status>("loading");
+  const [savedAt, setSavedAt] = useState<number | null>(null);
   // D-04: primera ciudad del array, sin caso especial. Sucre, capital
   // constitucional, es CITIES[0] por ese orden — no porque se privilegie.
   const [selectedId, setSelectedId] = useState<string>(CITIES[0].id);
 
   const load = useCallback(() => {
-    setIsLoading(true);
-    setError(false);
+    setStatus("loading");
     fetchForecasts()
-      .then((data) => setForecasts(data))
+      .then((data) => {
+        setForecasts(data);
+        setSavedAt(null);
+        setStatus("ok");
+        saveForecasts(data);
+      })
       .catch((cause: unknown) => {
         console.error(cause);
-        setError(true);
-      })
-      .finally(() => setIsLoading(false));
+        const cached = readForecasts();
+        if (cached) {
+          setForecasts(cached.forecasts);
+          setSavedAt(cached.savedAt);
+          setStatus("stale");
+        } else {
+          setStatus("error");
+        }
+      });
   }, []);
 
   // oxlint marca un aviso aceptado (set-state-in-effect) en el patrón
@@ -36,6 +56,8 @@ export default function App() {
   }, [load]);
 
   const selected = forecasts?.find((f) => f.city.id === selectedId);
+  const selectedCity = CITIES.find((c) => c.id === selectedId) ?? CITIES[0];
+  const showData = (status === "ok" || status === "stale") && selected;
 
   return (
     <>
@@ -52,18 +74,22 @@ export default function App() {
       </header>
 
       <main className="app">
-        {isLoading && <LoadingState />}
-        {!isLoading && error && <ErrorState onRetry={load} />}
+        {status === "stale" && savedAt !== null && (
+          <StaleBanner savedAt={savedAt} onRetry={load} />
+        )}
 
-        {!isLoading && !error && forecasts && (
+        {/* El selector no depende de la API (D-04), así que se muestra en los
+            cuatro estados: durante la carga y ante un fallo sigue siendo útil
+            y evita que la página dé un salto cuando llegan los datos. */}
+        <CitySelector cities={CITIES} selectedId={selectedId} onSelect={setSelectedId} />
+
+        {status === "loading" && <LoadingState />}
+        {status === "error" && <ErrorState cityName={selectedCity.name} onRetry={load} />}
+
+        {showData && (
           <>
-            <CitySelector cities={CITIES} selectedId={selectedId} onSelect={setSelectedId} />
-            {selected && (
-              <>
-                <TodayHero forecast={selected} />
-                <ForecastGrid forecast={selected} />
-              </>
-            )}
+            <TodayHero forecast={selected} isStale={status === "stale"} />
+            <ForecastGrid forecast={selected} />
           </>
         )}
       </main>
