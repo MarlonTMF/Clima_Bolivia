@@ -83,7 +83,7 @@ se sostiene igual ahora que no se construyó):
 | Criterio | Por qué es indiferente |
 |---|---|
 | Añadir una función serverless (de haberse construido) | El directorio `api/` de Vercel es agnóstico del framework — su documentación incluye una variante explícita `framework=other`. Coste idéntico en los siete. |
-| Rendimiento percibido | La red hacia Open-Meteo domina el presupuesto, con o sin proxy en medio. La diferencia entre 2 KB y 90 KB de runtime son decenas de milisegundos sobre unos ~500 ms. |
+| Rendimiento percibido | La red hacia Open-Meteo domina el presupuesto, con o sin proxy en medio. La diferencia entre 2 KB y 90 KB de runtime son decenas de milisegundos sobre ~1,7 s de carga total, **medidos en producción** (ver «Rendimiento medido» al final). |
 | Escalabilidad de carga | Frontend estático servido por CDN. Idéntico en todos. |
 | Seguridad | Ninguno expone secretos: Open-Meteo no pide clave. |
 | Coste | Los siete caben en el plan gratuito de la plataforma. |
@@ -124,9 +124,10 @@ vacía con React 19 da **68,60 KB gzip** (219,63 KB sin comprimir). La cifra de
 ~42 KB que citaban las comparativas de terceros se queda **un 38 % corta**: era
 para el núcleo de React 18, no para React 19 más el arranque de la aplicación.
 
-Esto **no cambia la decisión** —sigue siendo irrelevante frente a los ~500 ms
-de red— pero sí cambia lo que se puede afirmar por escrito. En el README va
-68,60 KB, medido aquí, y no un número copiado de un artículo.
+Esto **no cambia la decisión** —sigue siendo irrelevante frente a la red, que
+se midió después en ~1 s (ver «Rendimiento medido»)— pero sí cambia lo que se
+puede afirmar por escrito. En el README va 68,60 KB, medido aquí, y no un
+número copiado de un artículo.
 
 **Caveat que queda.** Los pesos de Vue, Svelte, Astro, Next.js y Angular siguen
 siendo de comparativas de terceros y sin medir. Si la de React estaba un 38 %
@@ -779,3 +780,45 @@ nada**. Se añadió una aserción que compara los parámetros `latitude` y
 `longitude` contra `CITIES`. Y se comprobó que la prueba sirve, invirtiendo
 el orden a propósito: falla. **Al hacerlo, las otras seis pruebas del archivo
 siguieron pasando** — la demostración exacta de por qué hacía falta.
+
+---
+
+## Rendimiento medido en producción (bloque 16)
+
+La estimación del bloque 03 daba un presupuesto de carga de **280–760 ms**, con
+la petición a Open-Meteo en 200–600 ms y una cuota del ~70 % para la red. Eran
+números razonados, no medidos. En el bloque 16 se midieron contra el despliegue
+real, con Playwright, **cinco ejecuciones con contexto limpio cada una**, y se
+toma la mediana para que una ejecución lenta no decida:
+
+| Fase | Mediana de 5 |
+|---|---|
+| TTFB — respuesta del CDN de Vercel | **65 ms** |
+| First Contentful Paint | **524 ms** |
+| DOMContentLoaded | **479 ms** |
+| Espera de la respuesta de Open-Meteo | **992 ms** |
+| **Total hasta ver datos en pantalla** | **≈ 1 680 ms** |
+
+**La estructura del argumento se sostiene y los números no.** La red sigue
+dominando —59 % del total, frente al ~70 % estimado— así que la conclusión de
+D-02 no cambia: optimizar el framework para ahorrar decenas de milisegundos
+mientras la API se lleva un segundo sería optimizar la parte pequeña. Pero el
+**total real es más del doble de la estimación alta**: 1,7 s frente a 760 ms, y
+la petición a Open-Meteo tarda ~1 s, no los 200–600 ms supuestos.
+
+Es la segunda vez que pasa lo mismo en este proyecto: el peso del bundle de
+React se estimó en ~42 KB copiando comparativas de terceros y midió 68,60 KB.
+**Las cifras razonadas tienden a quedarse cortas, y solo se sabe midiendo.** Lo
+que va al README son estas, no las del plan.
+
+**Detalle metodológico, porque cambia el resultado.** La primera medición dio
+5,1 s, y era un artefacto: se había usado `waitUntil: "networkidle"`, que espera
+500 ms de inactividad de red *después* de que todo termine. Medir hasta que la
+primera tarjeta existe en el DOM da 1,7 s. La diferencia entre ambas no es
+ruido: es que **medían cosas distintas**, y la primera no correspondía a nada
+que el usuario experimente.
+
+**Lo que no se midió.** Esto es una máquina de escritorio con conexión fija y un
+navegador headless, desde una única ubicación. No dice nada sobre 4G, ni sobre
+un teléfono real, ni sobre otras regiones. Las métricas de Lighthouse van
+aparte, en el bloque 17.

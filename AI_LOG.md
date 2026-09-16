@@ -575,3 +575,43 @@ algo fuera de estas paradas se registra igual.
   sin discusión. Yo en el descarte del décimo.
 - **¿Va al README?** Sí — «una sugerencia de la IA que decidiste no
   utilizar» y «cómo validas los resultados».
+
+---
+
+## E-16 · El presupuesto de rendimiento estaba estimado, no medido
+- **Fecha / bloque:** 16-09-2026 · Bloque 16
+- **Tipo:** verificación
+- **Herramienta:** Playwright contra el despliegue de producción
+- **Qué propuso la IA:** En el bloque 03 escribí un presupuesto de carga
+  detallado: descarga del bundle 50–100 ms, arranque del framework 20–40 ms,
+  petición a Open-Meteo 200–600 ms, render 5–16 ms, **total 280–760 ms**, con
+  la red llevándose el ~70 %. Estaba razonado por partes y suena verosímil;
+  ninguna de esas cifras se había medido.
+- **Qué encontré o decidí yo:** Al verificar el despliegue medí de verdad, y
+  la primera cifra fue **5,1 s** — alarmante y falsa. Era un artefacto de
+  medición: había usado `waitUntil: "networkidle"`, que espera 500 ms de
+  inactividad de red *después* de que todo termine. Cambiando a medir hasta
+  que la primera tarjeta existe en el DOM, y **repitiendo cinco veces con
+  contexto limpio para tomar la mediana** en vez de fiarme de una ejecución:
+  TTFB 65 ms, First Contentful Paint 524 ms, espera de Open-Meteo 992 ms,
+  **total ≈ 1 680 ms**, con la red en el 59 %.
+- **Cómo se resolvió:** Se documentaron las cifras medidas en
+  `docs/decisiones.md` y se corrigieron las dos menciones de «~500 ms» que
+  venían de la estimación. Al README van las medidas.
+- **Por qué:** La conclusión de D-02 sobrevive —la red domina, así que
+  cambiar de framework para ahorrar decenas de milisegundos sería optimizar
+  la parte pequeña— pero **el total real es más del doble de la estimación
+  alta**, y la petición a la API tarda ~1 s y no los 200–600 ms supuestos.
+  Es la segunda vez que ocurre lo mismo: el bundle de React se estimó en
+  ~42 KB y midió 68,60 KB. El patrón que vale la pena nombrar es que **las
+  cifras razonadas por partes tienden a quedarse cortas**, porque cada tramo
+  se estima por su mejor caso y nadie suma los peores.
+  El segundo aprendizaje es sobre el método: una medición mal definida es
+  peor que ninguna. Los 5,1 s y los 1,7 s no eran ruido entre sí, **medían
+  cosas distintas**, y la primera no correspondía a nada que el usuario
+  experimente. Antes de reportar un número hay que poder decir exactamente
+  qué evento marca el principio y cuál el final.
+- **Fuente:** medición propia, 5 ejecuciones sobre clima-bolivia-theta.vercel.app
+- **Quién tenía razón:** La estructura del argumento era mía y se sostuvo;
+  los números eran míos y estaban mal. Ambas cosas cuentan.
+- **¿Va al README?** Sí — «cómo validas los resultados».
