@@ -124,3 +124,58 @@ resultado, y **qué es innegociable**.
 | La composición de la tarjeta de día | Las fuentes externas |
 | El comportamiento responsive | Cualquier JavaScript del export |
 | Radios de borde y sombras (los valores) | |
+
+---
+
+## 4 · Corrección tras la primera generación
+
+Pégalo en el **mismo chat** de Stitch donde generaste la versión 1, para que
+ajuste el diseño existente en vez de generar uno nuevo.
+
+```
+Ajusta el diseño con estos cambios:
+
+QUITAR POR COMPLETO
+- El gráfico de barras "Rango Térmico Semanal" y la pestaña "Comparativa 9
+  Capitales". No hay gráficos en esta aplicación.
+- El icono de usuario / perfil de la esquina superior derecha. No hay cuentas
+  ni login.
+- Todo el texto de "RED OFICIAL DE MONITOREO ATMOSFÉRICO", "ESTADO
+  PLURINACIONAL DE BOLIVIA" y "NORMA OMM REGIÓN III". No es un servicio
+  gubernamental; sustitúyelo por un pie de página simple: "Datos: Open-Meteo".
+- "Actualización continua cada 60 min" — cámbialo por "Actualización cada 30
+  minutos" (es el dato real).
+- Humedad (%) y presión (hPa). No están disponibles en nuestra fuente de
+  datos a granularidad diaria.
+
+MANTENER, PERO SIMPLIFICAR
+- El selector de ciudades con la ilustración de Bolivia: no es un mapa
+  geográfico real, es una IMAGEN ilustrativa del país con las 9 siluetas
+  departamentales como zonas clicables. Consérvalo así, pero simplifica la
+  lista de accesos rápidos de la derecha: en vez de 9 tarjetas grandes en
+  grilla, usa una lista compacta o un desplegable, porque hoy ocupa demasiado
+  espacio vertical para lo que es (elegir 1 de 9 opciones).
+
+AÑADIR — con datos reales
+El pronóstico incluye dos datos más por día, además de máxima, mínima y
+condición: sensación térmica (máxima y mínima) y viento máximo. Añádelos a
+cada tarjeta del día de forma compacta y secundaria — no deben competir
+visualmente con la máxima, que sigue siendo el dato dominante.
+
+DATOS REALES DE LA PAZ para las 7 tarjetas (reemplaza los que ya tenías):
+  Mar 15 sep | máx 18° (sensación 15°) · mín -2° (sensación -6°) | viento 17 km/h | Parcialmente nublado
+  Mié 16 sep | máx 17° (sensación 15°) · mín  1° (sensación -2°) | viento 14 km/h | Llovizna
+  Jue 17 sep | máx 16° (sensación 13°) · mín  1° (sensación -1°) | viento 19 km/h | Nublado
+  Vie 18 sep | máx 15° (sensación 14°) · mín  2° (sensación  0°) | viento 15 km/h | Nieve
+  Sáb 19 sep | máx 16° (sensación 13°) · mín  2° (sensación  0°) | viento 15 km/h | Nieve
+  Dom 20 sep | máx 16° (sensación 16°) · mín -2° (sensación -6°) | viento  9 km/h | Despejado
+  Lun 21 sep | máx 17° (sensación 15°) · mín  0° (sensación -3°) | viento 18 km/h | Parcialmente nublado
+
+Nota: la sensación térmica puede ser bastante más baja que la temperatura del
+aire en el Altiplano (por el viento y la altitud) — el diseño debe aguantar
+diferencias de hasta 6-7 grados entre ambas sin verse desordenado.
+
+En el panel de resumen superior (donde antes decía "Sensación 11° · 48%
+Humedad · 14 km/h Viento · 660 hPa Presión"), dejar solo la sensación térmica
+y el viento del día actual, quitando humedad y presión.
+```
