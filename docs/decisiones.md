@@ -573,3 +573,42 @@ cada 30 minutos", que es la ventana de caché planeada para el proxy de
 D-09. Hoy el cliente carga una sola vez al montar; el texto describe la
 arquitectura completa, que todavía no existe. Revisar que siga siendo
 cierto cuando el proxy se implemente.
+
+---
+
+## Fidelidad al diseño, tercera vuelta: mapa y encabezado oscuro
+
+Segunda ronda de revisión (16-09-2026), contra una captura nueva que el
+usuario compartió del diseño original en Stitch — más detallada que la
+primera referencia guardada. Faltaban dos piezas grandes:
+
+**`CountryMap.tsx`, nuevo.** Habíamos simplificado el mapa a un `<select>`
+plano (ver nota anterior de fidelidad y `docs/design/tokens.md`); se trae
+de vuelta, pero con una regla: la silueta es **ilustrativa, no un contorno
+geográfico preciso** — mismo criterio que D-08 aplicó al descartar el
+`code.html` de Stitch. Lo único que sí es exacto son las **posiciones de
+los 9 puntos**: se calcularon proyectando la latitud/longitud real de
+`cities.ts` sobre el panel (ver script de proyección en el historial de
+comandos), no se dibujaron a ojo. La interacción vive en botones HTML
+reales superpuestos (`country-map__hotspots`), no en hit-areas dentro del
+propio SVG — más simple de hacer accesible.
+
+**Tarjeta rica de ciudad seleccionada.** Avatar con iniciales, badge
+"Activo", capital + elevación + departamento. El `<select>` nativo sigue
+siendo el control real (D-03: sin librería de listbox), superpuesto
+invisible sobre toda la tarjeta — un clic en cualquier punto la abre, y
+el teclado/lector de pantalla usan el control real sin trabajo adicional.
+
+**Encabezado oscuro** (gradiente navy), no blanco — contraste verificado
+con la misma fórmula de WCAG: texto blanco sobre el fondo más claro del
+degradado da ~11.8:1, sin problema.
+
+**Bug real encontrado al construir las iniciales:** un filtro por longitud
+de palabra (descartar palabras de ≤2 letras como conectores) le quitaba a
+"La Paz" su "La" y dejaba solo "P". El error: "La" es parte del nombre en
+"La Paz", pero "de"/"la" SÍ son conectores en "Santa Cruz de la Sierra" —
+la misma palabra cumple los dos roles según el caso, así que ningún
+filtro genérico distingue ambos correctamente. Se reemplazó por una tabla
+explícita de 9 entradas (mismo criterio que D-04 aplica a las coordenadas:
+con datos fijos y pocos, una tabla es más simple y más correcta que una
+heurística).

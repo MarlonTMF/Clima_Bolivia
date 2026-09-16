@@ -40,12 +40,12 @@ export default function App() {
     <>
       <header className="site-header">
         <div className="site-header__brand">
-          <span className="site-header__dot" aria-hidden="true" />
+          <span className="site-header__icon" aria-hidden="true">☀️</span>
           <strong>BOLIVIA CLIMA</strong>
           <span className="site-header__divider" aria-hidden="true" />
           <span className="site-header__tag">Pronóstico meteorológico departamental</span>
         </div>
-        <span className="site-header__meta">UTC-4 · Bolivia</span>
+        <span className="site-header__meta">UTC-4 · Hora oficial de Bolivia</span>
       </header>
 
       <main className="app">

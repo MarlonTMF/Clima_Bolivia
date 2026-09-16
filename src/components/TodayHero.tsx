@@ -20,7 +20,8 @@ export function TodayHero({ forecast }: Props) {
     <section className="today-hero">
       <div className="today-hero__place">
         <p className="today-hero__caption">
-          {forecast.city.elevationM} m s. n. m. · {forecast.city.department}
+          <span aria-hidden="true">📍</span> {forecast.city.elevationM} m s. n. m. ·{" "}
+          {forecast.city.department}
         </p>
         <h2 className="today-hero__city">{forecast.city.name}</h2>
         <p className="today-hero__condition">

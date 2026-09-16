@@ -54,7 +54,7 @@ body {
   outline-offset: 2px;
 }
 
-/* ---------- encabezado con marca, a sangre completa ---------- */
+/* ---------- encabezado oscuro, a sangre completa ---------- */
 .site-header {
   display: flex;
   flex-wrap: wrap;
@@ -62,8 +62,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: var(--space-md) var(--space-lg);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-line);
+  background: linear-gradient(100deg, #0b2942, #0f3a5c 55%, #0d3350);
+  border-bottom: 1px solid #08233a;
 }
 .site-header__brand {
   display: flex;
@@ -71,32 +71,31 @@ body {
   gap: var(--space-sm);
   flex-wrap: wrap;
 }
-.site-header__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-accent);
+.site-header__icon {
+  font-size: 1.1rem;
+  line-height: 1;
   flex: none;
 }
 .site-header__brand strong {
   font-size: 1rem;
   letter-spacing: 0.02em;
+  color: white;
 }
 .site-header__divider {
   width: 1px;
   height: 1rem;
-  background: var(--color-line);
+  background: rgba(255, 255, 255, 0.25);
 }
 .site-header__tag {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-ink-soft);
+  color: rgba(255, 255, 255, 0.7);
 }
 .site-header__meta {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--color-ink-soft);
+  color: rgba(255, 255, 255, 0.85);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -151,61 +150,194 @@ body {
   color: white;
 }
 
-/* ---------- selector: tarjeta bordeada con chevron propio ---------- */
-.city-selector {
-  margin-bottom: var(--space-lg);
-}
-.city-selector__label {
-  display: block;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-ink-soft);
-  margin-bottom: var(--space-xs);
-}
-.city-selector__control {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
+/* ---------- selector: mapa + tarjeta rica de ciudad ---------- */
+.city-picker {
   background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-lg);
-  padding: 0.4rem var(--space-md);
   box-shadow: var(--shadow-card);
-  max-width: min(26rem, 100%); /* 26rem (416px) desbordaba un viewport de 375px */
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
 }
-.city-selector__select {
-  flex: 1;
-  min-width: 0; /* permite que el select se encoja; si no, desborda el
-                   contenedor aunque este tenga max-width (bug real
-                   encontrado al verificar a 375px) */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font: inherit;
+.city-picker__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.city-picker__head h2 {
+  margin: 0;
   font-size: 1rem;
-  font-weight: 600;
-  padding: 0.4rem 0;
-  border: none;
-  background: transparent;
-  color: var(--color-ink);
-  /* select nativo, pero sin la flecha por defecto: se dibuja una propia
-     para acercarse al chevron de la referencia. */
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right center;
-  padding-right: 1.5rem;
-  max-width: 100%;
 }
-.city-selector__elevation {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+.city-picker__count {
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+}
+.city-picker__body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* mapa: decorativo, se oculta en móvil (la referencia móvil de Stitch
+   tampoco lo incluye — ver docs/design/tokens.md). Los botones que sí
+   seleccionan ciudad viven en HTML normal (.country-map__hotspots), el
+   <svg> es puramente visual. */
+.country-map {
+  position: relative;
+  background: var(--color-accent-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 220 / 260;
+}
+.country-map__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.country-map__silhouette {
+  fill: #bfe0f5;
+  stroke: #93c9e8;
+  stroke-width: 1.5;
+}
+.country-map__dot {
+  fill: var(--color-accent);
+  opacity: 0.55;
+}
+.country-map__dot--active {
+  fill: var(--color-accent-text);
+  opacity: 1;
+  stroke: white;
+  stroke-width: 2;
+}
+.country-map__dot-label {
+  font-size: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  fill: var(--color-ink);
+  text-anchor: middle;
+}
+.country-map__hotspots {
+  position: absolute;
+  inset: 0;
+}
+.country-map__hotspot {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -11px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.country-map__hotspot:hover {
+  background: rgba(2, 132, 199, 0.12);
+}
+
+.city-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent-line, var(--color-accent));
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+.city-card__eyebrow {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-soft);
+  margin-bottom: var(--space-sm);
+}
+.city-card__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.city-card__avatar {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.city-card__info {
+  flex: 1;
+  min-width: 0;
+}
+.city-card__name {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.city-card__active {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--color-accent-text);
+  color: white;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+.city-card__caption {
+  margin: 0.15rem 0 0;
   font-size: 0.8rem;
   color: var(--color-ink-soft);
-  border-left: 1px solid var(--color-line);
-  padding-left: var(--space-md);
+  overflow-wrap: break-word;
+}
+.city-card__elevation {
+  flex: none;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
   white-space: nowrap;
+}
+/* Control real, invisible, cubre toda la tarjeta (D-03: select nativo,
+   no una librería de listbox custom — teclado y lector de pantalla
+   gratis). Un clic en cualquier punto de la tarjeta abre el picker. */
+.city-card__select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  border-radius: inherit;
+}
+/* El select cubre toda la tarjeta (inset:0), así que su propio contorno
+   de foco ya rodea visualmente la tarjeta entera — no hace falta apuntar
+   a hermanos, que además no funcionaría: es el último hijo del DOM. */
+.city-card__select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .city-picker__body {
+    grid-template-columns: 1fr;
+  }
+  .country-map {
+    display: none;
+  }
 }
 
 /* ---------- panel "hoy": réplica del hero de Stitch ---------- */
@@ -350,7 +482,17 @@ body {
   font-weight: 500;
   color: var(--color-ink-soft);
 }
-.forecast-card__feels,
+.forecast-card__feels {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.7rem;
+  color: var(--color-ink-soft);
+  background: var(--color-ground);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  margin: 0.25rem 0 0.15rem;
+}
 .forecast-card__wind {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
