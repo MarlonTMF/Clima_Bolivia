@@ -377,3 +377,34 @@ algo fuera de estas paradas se registra igual.
 - **Fuente:** docs/api-sample.json (campo "elevation" de la respuesta real)
 - **Quién tenía razón:** —
 - **¿Va al README?** No — detalle de implementación, no de proceso con IA
+
+---
+
+## E-11 · La verificación fue contra la API real, no contra datos simulados
+- **Fecha / bloque:** 16-09-2026 · Bloque 07
+- **Tipo:** criterio propio
+- **Herramienta:** ejecución directa (tsx) del código real
+- **Qué propuso la IA:** —
+- **Qué encontré o decidí yo:** En vez de dar por buena la implementación
+  porque compila, se escribió un script temporal fuera de `src/` que llama a
+  `fetchForecasts()` de verdad, contra la API en vivo, y se ejecutó con
+  `npx tsx` (Node nativo no resuelve imports sin extensión igual que Vite,
+  así que `node` puro falló al primer intento con ERR_MODULE_NOT_FOUND).
+  Confirmó las 9 ciudades, 7 días cada una, los tres campos de D-11
+  poblados, y la prueba de humo Potosí (17°) vs Santa Cruz (25°) pasando de
+  verdad. El script se borró después — no aporta nada permanente al repo.
+- **Cómo se resolvió:** El camino feliz queda verificado end-to-end con
+  datos reales. Los 5 casos de error (`response.ok`, timeout, JSON
+  inesperado, red caída, código WMO desconocido) se probarán uno por uno
+  con fetch simulado en el bloque 08 — eso ya estaba decidido en D-10 y no
+  cambia; lo que aporta esta verificación es la certeza de que el camino
+  feliz funciona antes de blindar los fallos.
+- **Por qué:** Es la misma disciplina de E-06: una pieza de código "que
+  compila" no es lo mismo que una pieza de código que funciona. La
+  diferencia entre correr el parser contra la API real y solo leerlo es
+  la diferencia entre una verificación y una suposición con buena
+  ortografía.
+- **Fuente:** —
+- **Quién tenía razón:** —
+- **¿Va al README?** No — detalle de proceso, ya cubierto conceptualmente
+  por E-06
