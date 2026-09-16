@@ -846,9 +846,11 @@ body {
   }
   /* Pedido explícito: sin la etiqueta, los dos números de cada fila
      móvil se leían ambiguos (¿cuál es máxima, cuál mínima?). Se muestra
-     más pequeña que en escritorio para que quepa en la fila compacta. */
+     más pequeña que en escritorio para que quepa en la fila compacta.
+     0.55rem daba 8,8px, demasiado pequeño para el criterio "texto
+     legible" del caso M-08; 0.65rem = 10,4px y sigue cabiendo. */
   .forecast-card__temp-label {
-    font-size: 0.55rem;
+    font-size: 0.65rem;
   }
   .forecast-card__feels,
   .forecast-card__wind {
